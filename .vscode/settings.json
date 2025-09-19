@@ -1,0 +1,20 @@
+{
+  // Formatar automaticamente ao salvar
+  "editor.formatOnSave": true,
+  // Formatador padrão para todos os arquivos
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // Configurações específicas para JavaScript
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  // Configurações específicas para TypeScript
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  // Configurações específicas para JSON
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
