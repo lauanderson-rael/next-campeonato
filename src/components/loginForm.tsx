@@ -24,9 +24,8 @@ export default function LoginForm() {
         email,
         password,
         callbackUrl: "/dashboard",
-        redirect: false,
+        redirect: true,
       });
-      // Redirecionamento será feito pelo next-auth
     } catch (err) {
       setError("Email ou senha inválidos.");
     } finally {
