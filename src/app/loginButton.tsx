@@ -71,7 +71,7 @@ export default function LoginButton() {
         <Button
           type="submit"
           size="lg"
-          className="w-full font-semibold"
+          className="w-full font-semibold bg-green-600 text-white hover:bg-green-600/90"
           disabled={loading}
         >
           {loading ? "Entrando..." : "Entrar"}
@@ -82,7 +82,7 @@ export default function LoginButton() {
           onClick={loginGoogle}
           variant="outline"
           size="lg"
-          className="w-full flex gap-3 items-center justify-center font-semibold text-base shadow-md hover:scale-[1.03] transition-transform duration-200"
+          className="w-full flex gap-3 items-center justify-center font-semibold text-base shadow-md hover:scale-[1.03] transition-transform duration-200 border-green-600 text-green-600"
         >
           <Image
             src="/g-icon.png"

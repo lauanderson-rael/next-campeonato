@@ -20,7 +20,7 @@ export default function Header() {
     <div className="flex justify-between items-center p-4 bg-gray-200">
       <div className="flex items-center gap-2">
         <Image src="/logo-if.png" alt="Logo IFMA" width={50} height={50} />
-        <h1 className="text-xl font-bold">IFMA - Campeonatos</h1>
+  <h1 className="text-xl font-bold text-green-700">Campeonatos</h1>
       </div>
       <AlertDialog>
         <AlertDialogTrigger asChild>
