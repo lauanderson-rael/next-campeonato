@@ -14,9 +14,9 @@ export default function Home() {
             height={64}
             className="mb-2 drop-shadow-lg"
           />
-          <h1 className="text-center text-3xl font-bold text-primary mb-1 tracking-tight">
-            Sistema de Campeonatos
-          </h1>
+            <h1 className="text-center text-3xl font-bold text-green-700 mb-1 tracking-tight">
+              Campeonatos
+            </h1>
           <p className="text-muted-foreground text-center text-base">
             Gerencie campeonatos de forma simples, rápida e segura.
           </p>
@@ -26,7 +26,7 @@ export default function Home() {
         </div>
       </Card>
       <footer className="mt-8 text-xs text-muted-foreground opacity-80">
-        © {new Date().getFullYear()} IFMA - Todos os direitos reservados.
+        © {new Date().getFullYear()} - Todos os direitos reservados.
       </footer>
     </div>
   );
