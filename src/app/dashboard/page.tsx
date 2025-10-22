@@ -36,7 +36,6 @@ export default async function Dashboard() {
   return (
     <div className=" bg-gray-50">
       <div className="flex">
-        <Sidebar />
         <main className="flex-1 p-8">
           <h1 className="text-3xl font-bold mb-6">Dashboard Principal</h1>
 

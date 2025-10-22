@@ -14,27 +14,37 @@ import {
 // Menu items.
 const items = [
   {
-    title: "Home",
-    url: "#",
+    title: "Dashboard",
+    url: "/dashboard",
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "#",
+    title: "Jogadores",
+    url: "/dashboard/players",
     icon: Inbox,
   },
   {
-    title: "Calendar",
-    url: "#",
+    title: "Times",
+    url: "/dashboard/teams",
     icon: Calendar,
   },
   {
-    title: "Search",
-    url: "#",
+    title: "Campeonatos",
+    url: "/dashboard/class",
     icon: Search,
   },
   {
-    title: "Settings",
+    title: "Partidas",
+    url: "#",
+    icon: Settings,
+  },
+  {
+    title: "Classificação",
+    url: "#",
+    icon: Settings,
+  },
+  {
+    title: "Relatórios",
     url: "#",
     icon: Settings,
   },
@@ -42,10 +52,10 @@ const items = [
 
 export function AppSidebar() {
   return (
-    <Sidebar>
+    <Sidebar className="top-[84px]">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Navegação principal</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
