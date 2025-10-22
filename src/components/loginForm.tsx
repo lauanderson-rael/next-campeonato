@@ -94,7 +94,7 @@ export default function LoginForm() {
           <span className="tracking-tight">Login com Google</span>
         </Button>
         <div className="flex justify-between w-full mt-2 text-sm">
-          <a href="/register" className="text-primary hover:underline">
+          <a href="/register" className=" text-green-600 hover:underline">
             Criar conta
           </a>
           <a
