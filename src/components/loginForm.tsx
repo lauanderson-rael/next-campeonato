@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
-export default function LoginButton() {
+export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -71,7 +71,7 @@ export default function LoginButton() {
         <Button
           type="submit"
           size="lg"
-          className="w-full font-semibold"
+          className="w-full font-semibold bg-green-600 hover:bg-green-700"
           disabled={loading}
         >
           {loading ? "Entrando..." : "Entrar"}

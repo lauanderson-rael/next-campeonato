@@ -1,6 +1,6 @@
-import LoginButton from "./loginButton";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
+import LoginForm from "../components/loginForm";
 
 export default function Home() {
   return (
@@ -12,17 +12,17 @@ export default function Home() {
             alt="Logo IFMA"
             width={64}
             height={64}
-            className="mb-2 drop-shadow-lg"
+            className="mb-2 drop-shadow-lg "
           />
-          <h1 className="text-center text-3xl font-bold text-primary mb-1 tracking-tight">
-            Sistema de Campeonatos
+          <h1 className="text-center   text-4xl font-bold text-green-600 mb-1 tracking-tight">
+            IFMA - Campeonatos
           </h1>
-          <p className="text-muted-foreground text-center text-base">
-            Gerencie campeonatos de forma simples, rápida e segura.
-          </p>
         </div>
+        <p className="text-muted-foreground text-center text-base">
+          Gerencie campeonatos de forma simples, rápida e segura.
+        </p>
         <div className="w-full flex flex-col items-center mt-4">
-          <LoginButton />
+          <LoginForm />
         </div>
       </Card>
       <footer className="mt-8 text-xs text-muted-foreground opacity-80">

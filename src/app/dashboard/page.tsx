@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 
@@ -18,8 +17,6 @@ export default async function Dashboard() {
   }
   return (
     <div className="w-full h-screen">
-      <Header />
-
       <div className="flex flex-col gap-4 p-2 ">
         <h2 className="text-2xl">Dashboard</h2>
         <p>Olá {session.user?.name}</p>
