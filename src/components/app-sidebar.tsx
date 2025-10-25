@@ -1,4 +1,14 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+import {
+  Calendar,
+  Home,
+  Search,
+  Newspaper,
+  ShieldHalf,
+  ChartNoAxesColumn,
+  UserRound,
+  School,
+  School2,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -21,32 +31,32 @@ const items = [
   {
     title: "Jogadores",
     url: "/dashboard/players",
-    icon: Inbox,
+    icon: UserRound,
   },
   {
     title: "Times",
     url: "/dashboard/teams",
-    icon: Calendar,
+    icon: ShieldHalf,
   },
   {
-    title: "Campeonatos",
+    title: "Classes",
     url: "/dashboard/class",
-    icon: Search,
+    icon: School2,
   },
   {
     title: "Partidas",
     url: "#",
-    icon: Settings,
+    icon: Calendar,
   },
   {
     title: "Classificação",
     url: "#",
-    icon: Settings,
+    icon: ChartNoAxesColumn,
   },
   {
     title: "Relatórios",
     url: "#",
-    icon: Settings,
+    icon: Newspaper,
   },
 ];
 
