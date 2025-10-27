@@ -1,8 +1,16 @@
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
-import Topbar from "@/components/TobBar";
 import DashboardCard from "@/components/DashboardCard";
+
+// Importa os ícones da lucide-react
+import {
+  Users,
+  Shield,
+  Trophy,
+  ClipboardList,
+  Medal,
+  BarChart3,
+} from "lucide-react";
 
 export interface User {
   user: {
@@ -15,7 +23,7 @@ export interface User {
 export default async function Dashboard() {
   const session: User | null = await getServerSession();
 
-  // Development bypass: set NEXT_PUBLIC_DEV_DASHBOARD=1 to view /dashboard without authentication
+  // Permite visualizar o dashboard sem autenticação no modo dev
   const devBypass =
     process.env.NEXT_PUBLIC_DEV_DASHBOARD === "1" &&
     process.env.NODE_ENV === "development";
@@ -25,26 +33,51 @@ export default async function Dashboard() {
   }
 
   const cards = [
-    { title: "Jogadores", icon: "👥" },
-    { title: "Times", icon: "🛡️" },
-    { title: "Campeonatos", icon: "🏆" },
-    { title: "Partidas", icon: "📋" },
-    { title: "Classificação", icon: "🏅" },
-    { title: "Relatórios", icon: "📊" },
+    {
+      title: "Jogadores",
+      icon: <Users className="w-6 h-6 text-blue-600" />,
+      href: "/dashboard/players",
+    },
+    {
+      title: "Times",
+      icon: <Shield className="w-6 h-6 text-green-600" />,
+      href: "/dashboard/teams",
+    },
+    {
+      title: "Campeonatos",
+      icon: <Trophy className="w-6 h-6 text-yellow-500" />,
+      href: "/dashboard/tournaments",
+    },
+    {
+      title: "Partidas",
+      icon: <ClipboardList className="w-6 h-6 text-purple-600" />,
+      href: "/dashboard/matches",
+    },
+    {
+      title: "Classificação",
+      icon: <Medal className="w-6 h-6 text-orange-500" />,
+      href: "/dashboard/ranking",
+    },
+    {
+      title: "Relatórios",
+      icon: <BarChart3 className="w-6 h-6 text-indigo-600" />,
+      href: "/dashboard/reports",
+    },
   ];
 
   return (
-    <div className=" bg-gray-50">
-      <div className="flex">
-        <main className="flex-1 p-8">
+    <div className="bg-gray-50">
+      <div className="flex ">
+        <main className="flex-1 p-8 ">
           <h1 className="text-3xl font-bold mb-6">Dashboard Principal</h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
             {cards.map((c) => (
               <DashboardCard
                 key={c.title}
                 title={c.title}
-                icon={<span>{c.icon}</span>}
+                icon={c.icon}
+                href={c.href || "/"}
               />
             ))}
           </div>

@@ -48,7 +48,10 @@ export default function Header() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => signOut()}>
+            <AlertDialogAction
+              onClick={() => signOut()}
+              className="bg-green-600 hover:bg-green-700"
+            >
               Continuar
             </AlertDialogAction>
           </AlertDialogFooter>

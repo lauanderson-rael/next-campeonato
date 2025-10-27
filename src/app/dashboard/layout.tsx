@@ -22,7 +22,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       <Header />
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-auto">
         <SidebarProvider defaultOpen={true}>
           <AppSidebar />
           <main className="flex-1 overflow-y-auto relative">

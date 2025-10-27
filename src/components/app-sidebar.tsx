@@ -1,12 +1,10 @@
 import {
   Calendar,
   Home,
-  Search,
   Newspaper,
   ShieldHalf,
   ChartNoAxesColumn,
   UserRound,
-  School,
   School2,
 } from "lucide-react";
 
