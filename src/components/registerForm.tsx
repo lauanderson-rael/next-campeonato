@@ -1,26 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-// Componente apresentacional apenas front-end.
-// Aceita um prop opcional `onSubmit` para que o pai decida o que fazer com os dados.
-export function RegisterForm({
-  onSubmit,
-}: {
-  onSubmit?: (data: {
-    name: string;
-    email: string;
-    password: string;
-  }) => Promise<void> | void;
-}) {
+export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { register } = useAuth();
+  const router = useRouter();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
+    setError("");
 
     const formData = new FormData(event.currentTarget);
     const data = {
@@ -30,14 +26,14 @@ export function RegisterForm({
     };
 
     try {
-      if (onSubmit) {
-        await onSubmit(data);
+      const success = await register(data.name, data.email, data.password);
+      if (success) {
+        router.push("/dashboard");
       } else {
-        // Comportamento padrão para desenvolvimento: apenas logar os dados
-        // Você pode remover ou alterar isso conforme precisar
-        // eslint-disable-next-line no-console
-        console.log("RegisterForm submit:", data);
+        setError("Erro ao criar conta. Verifique os dados e tente novamente.");
       }
+    } catch (err) {
+      setError("Erro ao criar conta. Tente novamente.");
     } finally {
       setIsLoading(false);
     }
@@ -80,12 +76,14 @@ export function RegisterForm({
         />
       </div>
 
+      {error && <span className="text-destructive text-sm">{error}</span>}
+
       <Button
         className="w-full bg-green-600 hover:bg-green-700 text-white "
         type="submit"
         disabled={isLoading}
       >
-        {isLoading ? "Validando..." : "Criar conta"}
+        {isLoading ? "Criando conta..." : "Criar conta"}
       </Button>
     </form>
   );

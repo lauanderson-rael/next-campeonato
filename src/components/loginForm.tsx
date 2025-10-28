@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,29 +14,32 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  const { login } = useAuth();
+  const router = useRouter();
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
-    // login padrão q depende do seu backend (banco de dados, validação, etc).
+
     try {
-      await signIn("credentials", {
-        email,
-        password,
-        callbackUrl: "/dashboard",
-        redirect: false,
-      });
-      // Redirecionamento será feito pelo next-auth
+      const success = await login(email, password);
+      if (success) {
+        router.push("/dashboard");
+      } else {
+        setError("Email ou senha inválidos.");
+      }
     } catch (err) {
-      setError("Email ou senha inválidos.");
+      setError("Erro ao fazer login. Tente novamente.");
     } finally {
       setLoading(false);
     }
   }
 
   function loginGoogle() {
-    signIn("google", { callbackUrl: "/dashboard" });
+    // Implementar login com Google se necessário
+    console.log("Login com Google não implementado ainda");
   }
 
   return (
