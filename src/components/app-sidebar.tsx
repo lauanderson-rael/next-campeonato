@@ -1,4 +1,12 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+import {
+  Calendar,
+  Home,
+  Newspaper,
+  ShieldHalf,
+  ChartNoAxesColumn,
+  UserRound,
+  School2,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -14,45 +22,55 @@ import {
 // Menu items.
 const items = [
   {
-    title: "Home",
-    url: "#",
+    title: "Dashboard",
+    url: "/dashboard",
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
+    title: "Jogadores",
+    url: "/dashboard/players",
+    icon: UserRound,
   },
   {
-    title: "Calendar",
+    title: "Times",
+    url: "/dashboard/teams",
+    icon: ShieldHalf,
+  },
+  {
+    title: "Classes",
+    url: "/dashboard/class",
+    icon: School2,
+  },
+  {
+    title: "Partidas",
     url: "#",
     icon: Calendar,
   },
   {
-    title: "Search",
-    url: "#",
-    icon: Search,
+    title: "Classificação",
+    url: "dashboard/ranking",
+    icon: ChartNoAxesColumn,
   },
   {
-    title: "Settings",
+    title: "Relatórios",
     url: "#",
-    icon: Settings,
+    icon: Newspaper,
   },
 ];
 
 export function AppSidebar() {
   return (
-    <Sidebar>
+    <Sidebar className="top-[84px]">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Navegação principal</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
-                      <item.icon />
+                      <item.icon className="text-green-600 hover:text-green-800" />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
