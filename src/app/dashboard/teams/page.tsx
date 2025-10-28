@@ -83,15 +83,15 @@ export default function TeamsPage() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-6 space-y-6">
-      <Card className="w-full max-w-lg mt-4">
+    <div className="flex flex-col items-center p-4 md:p-6">
+      <Card className="w-full max-w-2xl ">
         <CardHeader className="flex justify-between items-center flex-row">
-          <CardTitle>Times Cadastrados</CardTitle>
+          <CardTitle>Times Cadastrados - {teams.length}</CardTitle>
 
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-700 hover:bg-green-800"
                 onClick={() => {
                   setEditingTeam(null);
                   setName("");
@@ -139,7 +139,7 @@ export default function TeamsPage() {
                 <DialogFooter>
                   <Button
                     type="submit"
-                    className="bg-green-600 hover:bg-green-700 w-full"
+                    className="bg-green-700 hover:bg-green-800 w-full"
                     disabled={loading}
                   >
                     {loading
@@ -160,7 +160,7 @@ export default function TeamsPage() {
           ) : teams.length === 0 ? (
             <p className="text-gray-500">Nenhum time cadastrado ainda.</p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-2 max-h-[60dvh] overflow-auto">
               {teams.map((team) => (
                 <li
                   key={team.id}

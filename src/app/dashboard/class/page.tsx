@@ -50,9 +50,9 @@ export default function ClassesPage() {
 
   // Função para atualizar os campos do formulário
   const handleFormChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -115,15 +115,15 @@ export default function ClassesPage() {
   };
 
   return (
-    <div className="flex flex-col items-center  min-h-screen p-6 space-y-6">
-      <Card className="w-full max-w-lg mt-4">
+    <div className="flex flex-col items-center p-4 md:p-6">
+      <Card className="w-full max-w-2xl">
         <CardHeader className="flex justify-between items-center flex-row">
-          <CardTitle>Classes Cadastradas</CardTitle>
+          <CardTitle>Classes Cadastradas - {classes.length}</CardTitle>
 
           {/* Botão + Modal */}
           <Dialog open={modalOpen} onOpenChange={setModalOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-green-600 hover:bg-green-700">
+              <Button className="bg-green-700 hover:bg-green-800">
                 + Adicionar
               </Button>
             </DialogTrigger>
@@ -163,7 +163,9 @@ export default function ClassesPage() {
                     id="semester"
                     placeholder="Ex: 1"
                     value={formData.semester}
-                    onChange={(e) => handleFormChange("semester", e.target.value)}
+                    onChange={(e) =>
+                      handleFormChange("semester", e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -186,7 +188,9 @@ export default function ClassesPage() {
                     type="number"
                     placeholder="Ex: 25"
                     value={formData.maxStudents}
-                    onChange={(e) => handleFormChange("maxStudents", e.target.value)}
+                    onChange={(e) =>
+                      handleFormChange("maxStudents", e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -194,7 +198,7 @@ export default function ClassesPage() {
                 <DialogFooter>
                   <Button
                     type="submit"
-                    className="bg-green-600 hover:bg-green-700 w-full"
+                    className="bg-green-700 hover:bg-green-800 w-full"
                     disabled={isSaving}
                   >
                     {isSaving ? "Cadastrando..." : "Cadastrar"}
@@ -211,7 +215,7 @@ export default function ClassesPage() {
           ) : classes.length === 0 ? (
             <p className="text-gray-500">Nenhuma classe cadastrada ainda.</p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-2 max-h-[60dvh] overflow-auto">
               {classes.map((cls) => (
                 <li
                   key={cls.id}

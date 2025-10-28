@@ -66,23 +66,23 @@ export default async function Dashboard() {
   ];
 
   return (
-    <div className="bg-gray-50">
-      <div className="flex ">
-        <main className="flex-1 p-8 ">
-          <h1 className="text-3xl font-bold mb-6">Dashboard Principal</h1>
+    <div>
+      <main className="flex-1 p-4 md:p-6">
+        <h1 className="text-2xl font-bold mb-4 text-center md:text-left">
+          Dashboard Principal
+        </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
-            {cards.map((c) => (
-              <DashboardCard
-                key={c.title}
-                title={c.title}
-                icon={c.icon}
-                href={c.href || "/"}
-              />
-            ))}
-          </div>
-        </main>
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
+          {cards.map((c) => (
+            <DashboardCard
+              key={c.title}
+              title={c.title}
+              icon={c.icon}
+              href={c.href || "/"}
+            />
+          ))}
+        </div>
+      </main>
     </div>
   );
 }

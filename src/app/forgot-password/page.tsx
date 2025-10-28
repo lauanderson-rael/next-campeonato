@@ -66,7 +66,7 @@ export default function RecoverPasswordPage() {
             />
             <button
               type="submit"
-              className="bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition"
+              className="bg-green-700 text-white py-2 rounded-md hover:bg-green-800 transition"
             >
               Enviar link
             </button>

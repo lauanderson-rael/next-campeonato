@@ -71,7 +71,7 @@ export default function LoginForm() {
         <Button
           type="submit"
           size="lg"
-          className="w-full font-semibold bg-green-600 hover:bg-green-700"
+          className="w-full font-semibold bg-green-700 hover:bg-green-800"
           disabled={loading}
         >
           {loading ? "Entrando..." : "Entrar"}
@@ -94,7 +94,7 @@ export default function LoginForm() {
           <span className="tracking-tight">Login com Google</span>
         </Button>
         <div className="flex justify-between w-full mt-2 text-sm">
-          <a href="/register" className=" text-green-600 hover:underline">
+          <a href="/register" className=" text-green-700 hover:underline">
             Criar conta
           </a>
           <a

@@ -14,7 +14,7 @@ export default function Home() {
             height={64}
             className="mb-2 drop-shadow-lg "
           />
-          <h1 className="text-center   text-4xl font-bold text-green-600 mb-1 tracking-tight">
+          <h1 className="text-center   text-4xl font-bold text-green-700 mb-1 tracking-tight">
             IFMA - Campeonatos
           </h1>
         </div>

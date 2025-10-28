@@ -93,15 +93,15 @@ export default function PlayersPage() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-6 space-y-6">
-      <Card className="w-full max-w-lg mt-4">
+    <div className="flex flex-col items-center m-4 md:m-6">
+      <Card className="w-full max-w-2xl">
         <CardHeader className="flex justify-between items-center flex-row">
-          <CardTitle>Jogadores Cadastrados</CardTitle>
+          <CardTitle>Jogadores Cadastrados - {players.length}</CardTitle>
 
           {/* Botão e Modal */}
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-green-600 hover:bg-green-700">
+              <Button className="bg-green-700 hover:bg-green-800">
                 + Adicionar
               </Button>
             </DialogTrigger>
@@ -181,7 +181,7 @@ export default function PlayersPage() {
                 <DialogFooter>
                   <Button
                     type="submit"
-                    className="bg-green-600 hover:bg-green-700 w-full"
+                    className="bg-green-700 hover:bg-green-800 w-full"
                     disabled={loading}
                   >
                     {loading ? "Cadastrando..." : "Cadastrar"}
@@ -198,7 +198,7 @@ export default function PlayersPage() {
           ) : players.length === 0 ? (
             <p className="text-gray-500">Nenhum jogador cadastrado ainda.</p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-2 max-h-[60dvh] overflow-auto">
               {players.map((player) => (
                 <li
                   key={player.id}

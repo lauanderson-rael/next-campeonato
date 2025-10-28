@@ -1,4 +1,10 @@
 "use client";
+import { useSidebar, SidebarTrigger } from "@/components/ui/sidebar"; // Adicione os imports necessários
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { signOut } from "next-auth/react";
+import { Menu } from "lucide-react"; // Ícone Menu/hamburger
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,23 +16,30 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-
-import { signOut } from "next-auth/react";
 
 export default function Header() {
+  const { setOpenMobile } = useSidebar(); // Hook do estado da sidebar
+
   return (
-    <div className="flex justify-between items-center px-4 py-4 bg-green-600 shadow-lg">
-      <div className="flex items-center gap-3">
+    <div className="flex justify-between items-center px-4 py-4 bg-green-700 shadow-lg sticky top-0">
+      <div className=" flex items-center gap-3">
+        {/* Botão para abrir Sidebar só aparece no mobile */}
+        <button
+          onClick={() => setOpenMobile(true)}
+          className="md:hidden text-white hover:text-green-300"
+          aria-label="Abrir menu"
+        >
+          <Menu size={22} />
+        </button>
+        {/* Logo ifma esconde so no mobile */}
         <Image
           src="/logo_white.png"
           alt="Logo IFMA"
-          width={48}
-          height={48}
-          className="drop-shadow-md"
+          width={36}
+          height={36}
+          className="drop-shadow-md hidden md:flex"
         />
-        <h1 className="text-2xl font-bold text-white tracking-tight">
+        <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">
           Sistema de Campeonatos
         </h1>
       </div>
@@ -50,7 +63,7 @@ export default function Header() {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => signOut()}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-700 hover:bg-green-800"
             >
               Continuar
             </AlertDialogAction>
