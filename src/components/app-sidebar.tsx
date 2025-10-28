@@ -48,7 +48,7 @@ const items = [
   },
   {
     title: "Classificação",
-    url: "#",
+    url: "dashboard/ranking",
     icon: ChartNoAxesColumn,
   },
   {

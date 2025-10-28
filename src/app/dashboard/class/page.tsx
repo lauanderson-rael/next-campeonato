@@ -14,19 +14,49 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+// Interfaces
+interface Class {
+  id: number;
+  name: string;
+  year: number;
+  semester: string;
+  course: string;
+  maxStudents: number;
+}
+
+interface FormData {
+  name: string;
+  year: string;
+  semester: string;
+  course: string;
+  maxStudents: string;
+}
+
 export default function ClassesPage() {
-  const [classes, setClasses] = useState<any[]>([]);
-  const [fetching, setFetching] = useState(true);
-  const [open, setOpen] = useState(false);
+  // Estados da listagem
+  const [classes, setClasses] = useState<Class[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const [name, setName] = useState("");
-  const [year, setYear] = useState<number | "">("");
-  const [semester, setSemester] = useState("");
-  const [course, setCourse] = useState("");
-  const [maxStudents, setMaxStudents] = useState<number | "">("");
-  const [loading, setLoading] = useState(false);
+  // Estados do formulário
+  const [formData, setFormData] = useState({
+    name: "",
+    year: "",
+    semester: "",
+    course: "",
+    maxStudents: "",
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Buscar classes
+  // Função para atualizar os campos do formulário
+  const handleFormChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Buscar classes do servidor
   const fetchClasses = async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/classes`);
@@ -35,18 +65,19 @@ export default function ClassesPage() {
     } catch (error) {
       console.error("Erro ao buscar classes:", error);
     } finally {
-      setFetching(false);
+      setIsLoading(false);
     }
   };
 
+  // Carregar classes quando o componente montar
   useEffect(() => {
     fetchClasses();
   }, []);
 
-  // Cadastro de classe
+  // Lidar com o envio do formulário
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsSaving(true);
 
     try {
       const response = await fetch(
@@ -55,30 +86,31 @@ export default function ClassesPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            name,
-            year: Number(year),
-            semester,
-            course,
-            maxStudents: Number(maxStudents),
+            ...formData,
+            year: Number(formData.year),
+            maxStudents: Number(formData.maxStudents),
           }),
         }
       );
 
       if (response.ok) {
-        setName("");
-        setYear("");
-        setSemester("");
-        setCourse("");
-        setMaxStudents("");
-        setOpen(false);
-        fetchClasses(); // Atualiza a listagem
+        // Limpar formulário e fechar modal
+        setFormData({
+          name: "",
+          year: "",
+          semester: "",
+          course: "",
+          maxStudents: "",
+        });
+        setModalOpen(false);
+        await fetchClasses(); // Atualizar listagem
       } else {
         alert("Erro ao cadastrar classe");
       }
     } catch (error) {
       alert("Erro ao conectar com o servidor");
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -89,7 +121,7 @@ export default function ClassesPage() {
           <CardTitle>Classes Cadastradas</CardTitle>
 
           {/* Botão + Modal */}
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={modalOpen} onOpenChange={setModalOpen}>
             <DialogTrigger asChild>
               <Button className="bg-green-600 hover:bg-green-700">
                 + Adicionar
@@ -107,8 +139,8 @@ export default function ClassesPage() {
                   <Input
                     id="name"
                     placeholder="Ex: Turma A"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={formData.name}
+                    onChange={(e) => handleFormChange("name", e.target.value)}
                     required
                   />
                 </div>
@@ -119,12 +151,8 @@ export default function ClassesPage() {
                     id="year"
                     type="number"
                     placeholder="Ex: 2024"
-                    value={year}
-                    onChange={(e) =>
-                      setYear(
-                        e.target.value === "" ? "" : Number(e.target.value)
-                      )
-                    }
+                    value={formData.year}
+                    onChange={(e) => handleFormChange("year", e.target.value)}
                     required
                   />
                 </div>
@@ -134,8 +162,8 @@ export default function ClassesPage() {
                   <Input
                     id="semester"
                     placeholder="Ex: 1"
-                    value={semester}
-                    onChange={(e) => setSemester(e.target.value)}
+                    value={formData.semester}
+                    onChange={(e) => handleFormChange("semester", e.target.value)}
                     required
                   />
                 </div>
@@ -145,8 +173,8 @@ export default function ClassesPage() {
                   <Input
                     id="course"
                     placeholder="Ex: Ciência da Computação"
-                    value={course}
-                    onChange={(e) => setCourse(e.target.value)}
+                    value={formData.course}
+                    onChange={(e) => handleFormChange("course", e.target.value)}
                     required
                   />
                 </div>
@@ -157,12 +185,8 @@ export default function ClassesPage() {
                     id="maxStudents"
                     type="number"
                     placeholder="Ex: 25"
-                    value={maxStudents}
-                    onChange={(e) =>
-                      setMaxStudents(
-                        e.target.value === "" ? "" : Number(e.target.value)
-                      )
-                    }
+                    value={formData.maxStudents}
+                    onChange={(e) => handleFormChange("maxStudents", e.target.value)}
                     required
                   />
                 </div>
@@ -171,9 +195,9 @@ export default function ClassesPage() {
                   <Button
                     type="submit"
                     className="bg-green-600 hover:bg-green-700 w-full"
-                    disabled={loading}
+                    disabled={isSaving}
                   >
-                    {loading ? "Cadastrando..." : "Cadastrar"}
+                    {isSaving ? "Cadastrando..." : "Cadastrar"}
                   </Button>
                 </DialogFooter>
               </form>
@@ -182,7 +206,7 @@ export default function ClassesPage() {
         </CardHeader>
 
         <CardContent>
-          {fetching ? (
+          {isLoading ? (
             <p>Carregando classes...</p>
           ) : classes.length === 0 ? (
             <p className="text-gray-500">Nenhuma classe cadastrada ainda.</p>
