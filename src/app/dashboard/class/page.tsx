@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Pencil, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,15 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+} from "@/components/ui/table"; // ajuste o import conforme seu projeto
 
 // Interfaces
 interface Class {
@@ -22,23 +32,13 @@ interface Class {
   semester: string;
   course: string;
   maxStudents: number;
-}
-
-interface FormData {
-  name: string;
-  year: string;
-  semester: string;
-  course: string;
-  maxStudents: string;
+  createdAt?: string;
 }
 
 export default function ClassesPage() {
-  // Estados da listagem
   const [classes, setClasses] = useState<Class[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-
-  // Estados do formulário
   const [formData, setFormData] = useState({
     name: "",
     year: "",
@@ -48,7 +48,6 @@ export default function ClassesPage() {
   });
   const [isSaving, setIsSaving] = useState(false);
 
-  // Função para atualizar os campos do formulário
   const handleFormChange = (field: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -56,7 +55,6 @@ export default function ClassesPage() {
     }));
   };
 
-  // Buscar classes do servidor
   const fetchClasses = async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/classes`);
@@ -69,12 +67,10 @@ export default function ClassesPage() {
     }
   };
 
-  // Carregar classes quando o componente montar
   useEffect(() => {
     fetchClasses();
   }, []);
 
-  // Lidar com o envio do formulário
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -94,7 +90,6 @@ export default function ClassesPage() {
       );
 
       if (response.ok) {
-        // Limpar formulário e fechar modal
         setFormData({
           name: "",
           year: "",
@@ -114,25 +109,44 @@ export default function ClassesPage() {
     }
   };
 
-  return (
-    <div className="flex flex-col items-center p-4 md:p-6">
-      <Card className="w-full max-w-2xl">
-        <CardHeader className="flex justify-between items-center flex-row">
-          <CardTitle>Classes Cadastradas - {classes.length}</CardTitle>
+  function formatDate(date?: string | null) {
+    if (!date) return <span className="text-gray-400">–</span>;
+    return new Date(date).toLocaleDateString("pt-BR");
+  }
 
-          {/* Botão + Modal */}
+  // Funções de ação simuladas
+  const handleEdit = (cls: Class) => {
+    alert(`Editar turma: ${cls.name}`);
+    // Aqui você pode abrir um modal, navegar, etc.
+  };
+  const handleDelete = async (cls: Class) => {
+    if (window.confirm(`Confirma exclusão de ${cls.name}?`)) {
+      // Faça solicitação DELETE e atualize estado
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/classes/${cls.id}`, {
+        method: "DELETE",
+      });
+      await fetchClasses();
+    }
+  };
+
+  return (
+    <main className="flex flex-col items-center p-4 md:p-6">
+      <h1 className="w-full text-2xl font-bold mb-4 text-center md:text-left">
+        Turmas
+      </h1>
+      <Card className="w-full max-w-4xl">
+        <CardHeader className="flex justify-between items-center flex-row">
+          <CardTitle>Turmas Cadastradas - {classes.length}</CardTitle>
           <Dialog open={modalOpen} onOpenChange={setModalOpen}>
             <DialogTrigger asChild>
               <Button className="bg-green-700 hover:bg-green-800">
                 + Adicionar
               </Button>
             </DialogTrigger>
-
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Cadastrar Nova Classe</DialogTitle>
+                <DialogTitle>Cadastrar Nova Turma</DialogTitle>
               </DialogHeader>
-
               <form onSubmit={handleSubmit} className="space-y-4 mt-2">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nome da Turma</Label>
@@ -144,7 +158,6 @@ export default function ClassesPage() {
                     required
                   />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="year">Ano</Label>
                   <Input
@@ -156,7 +169,6 @@ export default function ClassesPage() {
                     required
                   />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="semester">Semestre</Label>
                   <Input
@@ -169,7 +181,6 @@ export default function ClassesPage() {
                     required
                   />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="course">Curso</Label>
                   <Input
@@ -180,7 +191,6 @@ export default function ClassesPage() {
                     required
                   />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="maxStudents">Máx. de Alunos</Label>
                   <Input
@@ -194,7 +204,6 @@ export default function ClassesPage() {
                     required
                   />
                 </div>
-
                 <DialogFooter>
                   <Button
                     type="submit"
@@ -209,33 +218,69 @@ export default function ClassesPage() {
           </Dialog>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="max-h-[60dvh] overflow-y-auto ">
           {isLoading ? (
             <p>Carregando classes...</p>
-          ) : classes.length === 0 ? (
-            <p className="text-gray-500">Nenhuma classe cadastrada ainda.</p>
           ) : (
-            <ul className="space-y-2 max-h-[60dvh] overflow-auto">
-              {classes.map((cls) => (
-                <li
-                  key={cls.id}
-                  className="border rounded-lg p-2 flex justify-between items-center"
-                >
-                  <div>
-                    <p className="font-semibold">{cls.name}</p>
-                    <p className="text-sm text-gray-600">
-                      Ano: {cls.year} | Semestre: {cls.semester}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Curso: {cls.course} | Máx. Alunos: {cls.maxStudents}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <Table>
+              <TableCaption>Classes cadastradas: {classes.length}</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Ano</TableHead>
+                  <TableHead>Semestre</TableHead>
+                  <TableHead>Curso</TableHead>
+                  {/* <TableHead>Máx. de Alunos</TableHead> */}
+                  <TableHead>Data de Cadastro</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {classes.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="text-center text-gray-500"
+                    >
+                      Nenhuma classe cadastrada ainda.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  classes.map((cls) => (
+                    <TableRow key={cls.id}>
+                      <TableCell>{cls.name}</TableCell>
+                      <TableCell>{cls.year}</TableCell>
+                      <TableCell>{cls.semester}</TableCell>
+                      <TableCell>{cls.course}</TableCell>
+                      <TableCell>{formatDate(cls.createdAt)}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            aria-label="Editar"
+                            className="text-green-700 hover:text-green-900 p-2 rounded transition-colors"
+                            onClick={() => handleEdit(cls)}
+                          >
+                            <Pencil size={18} />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label="Excluir"
+                            className="text-red-600 hover:text-red-800 p-2 rounded transition-colors"
+                            onClick={() => handleDelete(cls)}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>
-    </div>
+    </main>
   );
 }

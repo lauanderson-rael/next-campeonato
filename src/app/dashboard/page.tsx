@@ -71,6 +71,9 @@ export default async function Dashboard() {
         <h1 className="text-2xl font-bold mb-4 text-center md:text-left">
           Dashboard Principal
         </h1>
+        <p className="text-gray-600 mb-6 text-sm md:text-lg  text-center md:text-left">
+          Sistema de gestão esportiva — controle total do seu campeonato.
+        </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
           {cards.map((c) => (
@@ -86,42 +89,3 @@ export default async function Dashboard() {
     </div>
   );
 }
-
-/*
-import { getServerSession } from "next-auth/next";
-import { redirect } from "next/navigation";
-
-export interface User {
-  user: {
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  };
-}
-
-export default async function Dashboard() {
-  const session: User | null = await getServerSession();
-
-  if (!session) {
-    return redirect("/");
-  }
-  return (
-    <div className="w-full h-screen">
-    <div className="flex flex-col gap-4 p-2 ">
-    <h2 className="text-2xl">Dashboard</h2>
-    <p>Olá {session.user?.name}</p>
-    <div>Email: {session.user?.email}</div>
-
-        <img
-          src={session.user?.image!}
-          className="img-fluid rounded-top "
-          width={150}
-          height={150}
-          alt=""
-        />
-      </div>
-    </div>
-  );
-}
-
-    */
