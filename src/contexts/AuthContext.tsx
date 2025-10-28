@@ -16,6 +16,7 @@ interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<boolean>
   logout: () => void
   loading: boolean
+  processGoogleToken: (token: string) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -39,6 +40,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     setLoading(false)
   }, [])
+
+  // Função para processar token do Google OAuth
+  const processGoogleToken = async (googleToken: string) => {
+    try {
+      const response = await fetch(`${API_URL}/auth/profile`, {
+        headers: {
+          'Authorization': `Bearer ${googleToken}`
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setUser(data.user)
+        setToken(googleToken)
+        
+        // Salvar no localStorage
+        localStorage.setItem('token', googleToken)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Erro ao processar token do Google:', error)
+      return false
+    }
+  }
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -110,7 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, loading, processGoogleToken }}>
       {children}
     </AuthContext.Provider>
   )
