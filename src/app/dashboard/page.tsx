@@ -35,31 +35,40 @@ export default async function Dashboard() {
   const cards = [
     {
       title: "Jogadores",
+      description:
+        "Gerencie informações e cadastros dos atletas participantes.",
       icon: <Users className="w-6 h-6 text-blue-600" />,
       href: "/dashboard/players",
     },
     {
       title: "Times",
+      description: "Crie e edite as equipes inscritas nas competições.",
       icon: <Shield className="w-6 h-6 text-green-600" />,
       href: "/dashboard/teams",
     },
     {
       title: "Campeonatos",
+      description:
+        "Administre os torneios e eventos realizados pela instituição.",
       icon: <Trophy className="w-6 h-6 text-yellow-500" />,
       href: "/dashboard/tournaments",
     },
     {
       title: "Partidas",
+      description: "Organize os jogos, datas, horários e locais das partidas.",
       icon: <ClipboardList className="w-6 h-6 text-purple-600" />,
       href: "/dashboard/matches",
     },
     {
       title: "Classificação",
+      description: "Acompanhe resultados e posições dos times na tabela.",
       icon: <Medal className="w-6 h-6 text-orange-500" />,
       href: "/dashboard/ranking",
     },
     {
       title: "Relatórios",
+      description:
+        "Visualize estatísticas e relatórios detalhados das competições.",
       icon: <BarChart3 className="w-6 h-6 text-indigo-600" />,
       href: "/dashboard/reports",
     },
@@ -67,11 +76,11 @@ export default async function Dashboard() {
 
   return (
     <div>
-      <main className="flex-1 p-4 md:p-6">
-        <h1 className="text-2xl font-bold mb-4 text-center md:text-left">
+      <main className="flex-1 p-4 md:p-12">
+        <h1 className="text-2xl font-bold mb-4 text-center ">
           Dashboard Principal
         </h1>
-        <p className="text-gray-600 mb-6 text-sm md:text-lg  text-center md:text-left">
+        <p className="text-gray-600 mb-6 text-sm md:text-lg  text-center">
           Sistema de gestão esportiva — controle total do seu campeonato.
         </p>
 
@@ -80,6 +89,7 @@ export default async function Dashboard() {
             <DashboardCard
               key={c.title}
               title={c.title}
+              description={c.description}
               icon={c.icon}
               href={c.href || "/"}
             />

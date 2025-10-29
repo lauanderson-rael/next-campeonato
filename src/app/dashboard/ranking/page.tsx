@@ -36,7 +36,7 @@ export default function RankingPage() {
     <div className="flex flex-col items-center m-4 md:m-6">
       <Card className="w-full max-w-2xl">
         <CardHeader>
-          <CardTitle className="text-center text-2xl font-bold text-green-600">
+          <CardTitle className="text-center text-2xl font-bold ">
             Tabela de Classificação
           </CardTitle>
         </CardHeader>
