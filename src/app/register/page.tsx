@@ -12,8 +12,8 @@ import {
 
 export default function RegisterPage() {
   return (
-    <div className="container flex h-screen w-screen flex-col items-center justify-center">
-      <Card className="w-[400px]">
+    <div className="flex h-screen w-screen flex-col items-center justify-center">
+      <Card className="w-96">
         <CardHeader>
           <div className="flex flex-col items-center gap-2">
             <Image
