@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sistema de Gerenciamento de Campeonatos IFMA
 
-## Getting Started
+Este projeto utiliza [Next.js](https://nextjs.org) para criar um painel moderno de gerenciamento de competições escolares, permitindo registrar, organizar e acompanhar jogadores, times, turmas, campeonatos, partidas, classificações e relatórios em ambiente web.
 
-First, run the development server:
+## Funcionalidades
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Cadastro, edição e exclusão de jogadores, times e turmas.
+- Organização de campeonatos, partidas e acompanhamento das classificações.
+- Relatórios detalhados e estatísticas dos eventos esportivos.
+- Interface administrativa intuitiva, com cards, tabelas, filtros e paginação.
+
+---
+
+## Guia de Instalação
+
+Para rodar o sistema em seu ambiente local, siga os passos abaixo:
+
+### 1. Instale as dependências
+
+No terminal, dentro da pasta do projeto, execute:
+
+```
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Inicie o servidor de desenvolvimento
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+O painel estará disponível em [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Saiba Mais (Next.js)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Documentação Next.js](https://nextjs.org/docs) — Recursos e APIs do framework.
+- [Tutorial Interativo](https://nextjs.org/learn) — Aprenda Next.js com lições práticas.
+- [GitHub do Next.js](https://github.com/vercel/next.js) — Colabore e veja o código-fonte.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Deploy na Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+A maneira mais fácil de publicar seu sistema online é pela [Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Confira as [instruções de implantação](https://nextjs.org/docs/app/building-your-application/deploying) para publicar e configurar sua aplicação.
+
+---
