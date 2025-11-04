@@ -1,10 +1,10 @@
 "use client";
-import { useSidebar, SidebarTrigger } from "@/components/ui/sidebar"; // Adicione os imports necessários
+import { useSidebar } from "@/components/ui/sidebar"; // Adicione os imports necessários
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
 import { Menu } from "lucide-react"; // Ícone Menu/hamburger
-
+import { useAuth } from "@/contexts/AuthContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +19,7 @@ import {
 
 export default function Header() {
   const { setOpenMobile } = useSidebar(); // Hook do estado da sidebar
+  const logout = useAuth();
 
   return (
     <div className="flex justify-between items-center px-4 py-4 bg-green-700 shadow-lg sticky top-0">
@@ -62,7 +63,7 @@ export default function Header() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => signOut()}
+              onClick={() => logout.logout()}
               className="bg-green-700 hover:bg-green-800"
             >
               Continuar

@@ -21,21 +21,21 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  
+
   const { login } = useAuth();
   const router = useRouter();
 
   // Carregar Google Identity Services
   useEffect(() => {
     const clientId = process.env.GOOGLE_CLIENT_ID;
-    
+
     if (!clientId) {
-      console.warn('GOOGLE_CLIENT_ID não está definido.');
+      console.warn("GOOGLE_CLIENT_ID não está definido.");
       return;
     }
 
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
@@ -44,7 +44,7 @@ export default function LoginForm() {
       if (window.google) {
         window.google.accounts.id.initialize({
           client_id: clientId,
-          callback: handleGoogleCallback
+          callback: handleGoogleCallback,
         });
       }
     };
@@ -59,36 +59,37 @@ export default function LoginForm() {
   const handleGoogleCallback = async (response: any) => {
     try {
       setLoading(true);
-      
+
       // Decodificar o JWT do Google
-      const payload = JSON.parse(atob(response.credential.split('.')[1]));
-      
+      const payload = JSON.parse(atob(response.credential.split(".")[1]));
+
       // Criar usuário no backend ou fazer login
       const API_URL = process.env.NEXT_PUBLIC_API_URL;
       const result = await fetch(`${API_URL}/auth/google-login`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           googleToken: response.credential,
           email: payload.email,
           name: payload.name,
-          picture: payload.picture
+          picture: payload.picture,
         }),
       });
 
       if (result.ok) {
         const data = await result.json();
         // Salvar token e usuário
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        router.push('/dashboard');
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        router.push("/dashboard");
       } else {
-        setError('Erro ao fazer login com Google');
+        setError("Erro ao fazer login com Google");
       }
     } catch (err) {
-      setError('Erro ao processar login do Google');
+      setError("Erro ao processar login do Google");
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -108,6 +109,7 @@ export default function LoginForm() {
       }
     } catch (err) {
       setError("Erro ao fazer login. Tente novamente.");
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -118,14 +120,14 @@ export default function LoginForm() {
     console.log(clientId);
     console.log(!clientId);
     if (!clientId) {
-      setError('Google OAuth não configurado.');
+      setError("Google OAuth não configurado.");
       return;
     }
 
     if (window.google && window.google.accounts) {
       window.google.accounts.id.prompt();
     } else {
-      setError('Google OAuth não carregado. Tente novamente.');
+      setError("Google OAuth não carregado. Tente novamente.");
     }
   }
 

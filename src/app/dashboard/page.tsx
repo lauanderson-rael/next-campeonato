@@ -1,8 +1,10 @@
-import { getServerSession } from "next-auth/next";
-import { redirect } from "next/navigation";
+"use client";
+// import { getServerSession } from "next-auth/next";
+// import { redirect } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import DashboardCard from "@/components/DashboardCard";
-
-// Importa os ícones da lucide-react
 import {
   Users,
   Shield,
@@ -12,25 +14,35 @@ import {
   BarChart3,
 } from "lucide-react";
 
-export interface User {
-  user: {
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  };
-}
+// export interface User {
+//   user: {
+//     name?: string | null;
+//     email?: string | null;
+//     image?: string | null;
+//   };
+// }
 
-export default async function Dashboard() {
-  const session: User | null = await getServerSession();
+export default function Dashboard() {
+  // const session: User | null = await getServerSession();
+  // // Permite visualizar o dashboard sem autenticação no modo dev
+  // const devBypass =
+  //   process.env.NEXT_PUBLIC_DEV_DASHBOARD === "1" &&
+  //   process.env.NODE_ENV === "development";
 
-  // Permite visualizar o dashboard sem autenticação no modo dev
-  const devBypass =
-    process.env.NEXT_PUBLIC_DEV_DASHBOARD === "1" &&
-    process.env.NODE_ENV === "development";
+  // if (!session && !devBypass) {
+  //   return redirect("/");
+  // }
+  const { user, loading } = useAuth();
+  const router = useRouter();
 
-  if (!session && !devBypass) {
-    return redirect("/");
-  }
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/");
+    }
+  }, [user, loading, router]);
+
+  if (loading) return <div>Carregando...</div>;
+  if (!user) return null;
 
   const cards = [
     {
@@ -83,7 +95,6 @@ export default async function Dashboard() {
         <p className="text-gray-600 mb-6 text-sm md:text-lg  text-center">
           Sistema de gestão esportiva — controle total do seu campeonato.
         </p>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
           {cards.map((c) => (
             <DashboardCard
