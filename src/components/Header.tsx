@@ -2,7 +2,6 @@
 import { useSidebar } from "@/components/ui/sidebar"; // Adicione os imports necessários
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { signOut } from "next-auth/react";
 import { Menu } from "lucide-react"; // Ícone Menu/hamburger
 import { useAuth } from "@/contexts/AuthContext";
 import {

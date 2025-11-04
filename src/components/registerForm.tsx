@@ -34,6 +34,7 @@ export function RegisterForm() {
       }
     } catch (err) {
       setError("Erro ao criar conta. Tente novamente.");
+      console.log(err);
     } finally {
       setIsLoading(false);
     }

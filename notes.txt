@@ -1,0 +1,4 @@
+Testar build localmente:
+
+npm run build
+npm start

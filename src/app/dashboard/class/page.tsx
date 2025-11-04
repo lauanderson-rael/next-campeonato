@@ -130,6 +130,7 @@ export default function ClassesPage() {
       }
     } catch (error) {
       alert("Erro ao conectar com o servidor");
+      console.error("Erro ao cadastrar classe:", error);
     } finally {
       setIsSaving(false);
     }
@@ -189,6 +190,7 @@ export default function ClassesPage() {
       }
     } catch (error) {
       alert("Erro ao conectar com o servidor");
+      console.error("Erro ao editar turma:", error);
     } finally {
       setIsEditing(false);
     }

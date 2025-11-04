@@ -31,6 +31,7 @@ export default function RecoverPasswordPage() {
       }
     } catch (err) {
       setMessage("Ocorreu um erro inesperado.");
+      console.error("Erro ao enviar o link de recuperação:", err);
     }
   };
 

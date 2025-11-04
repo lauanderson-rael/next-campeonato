@@ -138,6 +138,7 @@ export default function PlayersPage() {
       }
     } catch (error) {
       alert("Erro ao conectar com o servidor");
+      console.error("Erro ao cadastrar jogador:", error);
     } finally {
       setIsSaving(false);
     }
@@ -195,6 +196,7 @@ export default function PlayersPage() {
       }
     } catch (error) {
       alert("Erro ao conectar com o servidor");
+      console.error("Erro ao editar jogador:", error);
     } finally {
       setIsEditing(false);
     }

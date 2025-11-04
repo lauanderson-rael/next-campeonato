@@ -1,5 +1,5 @@
 "use client ";
-import { Home, Search, ArrowLeft, AlertCircle } from "lucide-react";
+import { Home } from "lucide-react";
 
 export default function NotFound() {
   return (

@@ -101,6 +101,7 @@ export default function TeamsPage() {
       }
     } catch (error) {
       alert("Erro ao conectar com o servidor");
+      console.error("Erro ao cadastrar time:", error);
     } finally {
       setIsSaving(false);
     }
@@ -147,6 +148,7 @@ export default function TeamsPage() {
       }
     } catch (error) {
       alert("Erro ao conectar com o servidor");
+      console.error("Erro ao editar time:", error);
     } finally {
       setIsEditing(false);
     }

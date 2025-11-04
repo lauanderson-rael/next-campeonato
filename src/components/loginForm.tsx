@@ -12,6 +12,7 @@ import { useState } from "react";
 
 declare global {
   interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     google: any;
   }
 }
@@ -56,7 +57,7 @@ export default function LoginForm() {
     };
   }, []);
 
-  const handleGoogleCallback = async (response: any) => {
+  const handleGoogleCallback = async (response: { credential: string }) => {
     try {
       setLoading(true);
 
