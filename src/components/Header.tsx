@@ -21,7 +21,7 @@ export default function Header() {
   const logout = useAuth();
 
   return (
-    <div className="flex justify-between items-center px-4 py-4 bg-green-700 shadow-lg sticky top-0">
+    <div className="flex  justify-between items-center px-4 py-4 bg-green-700 shadow-lg sticky top-0">
       <div className=" flex items-center gap-3">
         {/* Botão para abrir Sidebar só aparece no mobile */}
         <button
@@ -37,9 +37,9 @@ export default function Header() {
           alt="Logo IFMA"
           width={36}
           height={36}
-          className="drop-shadow-md hidden md:flex"
+          className="shadow-md hidden md:flex ml-2"
         />
-        <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+        <h1 className="text-md md:text-2xl font-bold text-white tracking-tight">
           Sistema de Campeonatos
         </h1>
       </div>

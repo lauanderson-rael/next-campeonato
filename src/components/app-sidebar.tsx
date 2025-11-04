@@ -7,6 +7,11 @@ import {
   School2,
   Shield,
   Users,
+  ChevronUp,
+  User2,
+  Settings,
+  Info,
+  LogOut,
 } from "lucide-react";
 
 import {
@@ -19,6 +24,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 
 import {
@@ -30,6 +36,13 @@ import {
 
 import { usePathname } from "next/navigation"; // Next.js 13+
 import { useSidebar } from "@/components/ui/sidebar";
+
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "./ui/dropdown-menu";
 
 // Menu items.
 const items = [
@@ -51,13 +64,13 @@ export function AppSidebar() {
   const { open } = useSidebar();
 
   return (
-    <Sidebar side="left" collapsible="icon">
+    <Sidebar side="left" collapsible="icon" variant="sidebar" className="ml-3">
       <SidebarTrigger className="ml-2 mt-1 text-gray-800 hidden md:flex hover:text-gray-950" />
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Navegação principal</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-2">
               {items.map((item) => {
                 const isActive = pathname === item.url;
 
@@ -68,7 +81,7 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         asChild
                         isActive={isActive}
-                        className={isActive ? "border-1 border-green-700" : ""}
+                        className={isActive ? "border border-green-700" : ""}
                       >
                         <a href={item.url}>
                           <item.icon className="text-green-700 hover:text-green-800" />
@@ -84,7 +97,7 @@ export function AppSidebar() {
                               asChild
                               isActive={isActive}
                               className={
-                                isActive ? "border-1 border-green-700" : ""
+                                isActive ? "border border-green-700" : ""
                               }
                             >
                               <a href={item.url}>
@@ -106,6 +119,41 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton>
+                  <Settings className="text-green-700 hover:text-green-800" />
+                  <span className="ml-2">Configurações</span>
+                  <ChevronUp className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                className="w-[--radix-popper-anchor-width] ml-2"
+              >
+                <DropdownMenuItem>
+                  <User2 className="mr-2 text-green-700 hover:text-green-800" />
+                  <span>Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Info className="mr-2 text-green-700 hover:text-green-800" />
+                  <a href="/dashboard/help">
+                    <span>Ajuda</span>
+                  </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <LogOut className="mr-2 text-green-700 hover:text-green-800" />
+                  <span>Sair do sistema</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

@@ -172,7 +172,7 @@ export default function LoginForm() {
         </Button>
       </form>
       <div className="flex flex-col gap-2 items-center">
-        <Button
+        {/* <Button
           onClick={loginGoogle}
           variant="outline"
           size="lg"
@@ -186,7 +186,7 @@ export default function LoginForm() {
             className="drop-shadow"
           />
           <span className="tracking-tight">Login com Google</span>
-        </Button>
+        </Button> */}
         <div className="flex justify-between w-full mt-2 text-sm">
           <a href="/register" className=" text-green-700 hover:underline">
             Criar conta
