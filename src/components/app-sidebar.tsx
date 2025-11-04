@@ -89,6 +89,7 @@ export function AppSidebar() {
                             >
                               <a href={item.url}>
                                 <item.icon className="text-green-700 hover:text-green-800" />
+                                <span className="ml-2">{item.title}</span>
                               </a>
                             </SidebarMenuButton>
                           </TooltipTrigger>
