@@ -1,28 +1,22 @@
 "use client";
-import { useSidebar } from "@/components/ui/sidebar"; // Adicione os imports necessários
-import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
 import Image from "next/image";
-import { Menu } from "lucide-react"; // Ícone Menu/hamburger
+import { Menu, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 export default function Header() {
-  const { setOpenMobile } = useSidebar(); // Hook do estado da sidebar
-  const logout = useAuth();
+  const { setOpenMobile } = useSidebar();
+  const { user } = useAuth();
+
+  const formatName = (fullName: string) => {
+    const names = fullName.trim().split(" ");
+    if (names.length === 1) return names[0];
+    return `${names[0]} ${names[names.length - 1]}`;
+  };
 
   return (
-    <div className="flex  justify-between items-center px-4 py-4 bg-green-700 shadow-lg sticky top-0">
-      <div className=" flex items-center gap-3">
+    <div className="flex justify-between items-center px-4 py-4 bg-green-700 shadow-lg sticky top-0">
+      <div className="flex items-center gap-3">
         {/* Botão para abrir Sidebar só aparece no mobile */}
         <button
           onClick={() => setOpenMobile(true)}
@@ -43,33 +37,14 @@ export default function Header() {
           Sistema de Campeonatos
         </h1>
       </div>
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            variant="outline"
-            className="bg-white hover:bg-gray-100 text-red-00 hover:text-red-700 font-semibold border-none shadow-md"
-          >
-            Logout
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Deseja realmente sair da conta?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Ao clicar em continuar você será deslogado da sua conta.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => logout.logout()}
-              className="bg-green-700 hover:bg-green-800"
-            >
-              Continuar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+
+      {/* Nome do usuário com ícone */}
+      <div className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-lg backdrop-blur-sm">
+        <User size={18} className="text-white" />
+        <span className="text-white font-medium text-sm md:text-base">
+          {user?.name ? formatName(user.name) : "Usuário"}
+        </span>
+      </div>
     </div>
   );
 }

@@ -1,10 +1,9 @@
 "use client";
-// import { getServerSession } from "next-auth/next";
-// import { redirect } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import DashboardCard from "@/components/DashboardCard";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Users,
   Shield,
@@ -14,24 +13,7 @@ import {
   BarChart3,
 } from "lucide-react";
 
-// export interface User {
-//   user: {
-//     name?: string | null;
-//     email?: string | null;
-//     image?: string | null;
-//   };
-// }
-
 export default function Dashboard() {
-  // const session: User | null = await getServerSession();
-  // // Permite visualizar o dashboard sem autenticação no modo dev
-  // const devBypass =
-  //   process.env.NEXT_PUBLIC_DEV_DASHBOARD === "1" &&
-  //   process.env.NODE_ENV === "development";
-
-  // if (!session && !devBypass) {
-  //   return redirect("/");
-  // }
   const { user, loading } = useAuth();
   const router = useRouter();
 
@@ -41,7 +23,33 @@ export default function Dashboard() {
     }
   }, [user, loading, router]);
 
-  if (loading) return <div>Carregando...</div>;
+  if (loading) {
+    return (
+      <div>
+        <main className="flex-1 p-4 md:p-12">
+          {/* Skeleton do título */}
+          <Skeleton className="h-8 w-64 mx-auto mb-4" />
+          {/* Skeleton da descrição */}
+          <Skeleton className="h-5 w-96 mx-auto mb-6" />
+
+          {/* Skeleton dos cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="border rounded-lg p-6 space-y-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <Skeleton className="h-6 w-32" />
+                </div>
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+            ))}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   if (!user) return null;
 
   const cards = [
@@ -88,14 +96,14 @@ export default function Dashboard() {
 
   return (
     <div>
-      <main className="flex-1 p-4 md:p-12">
-        <h1 className="text-2xl font-bold mb-4 text-center ">
+      <main className="flex-1 p-4 md:px-12">
+        <h1 className="text-2xl font-bold mb-4 text-center">
           Dashboard Principal
         </h1>
-        <p className="text-gray-600 mb-6 text-sm md:text-lg  text-center">
+        <p className="text-gray-600 mb-6 text-sm md:text-lg text-center">
           Sistema de gestão esportiva — controle total do seu campeonato.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {cards.map((c) => (
             <DashboardCard
               key={c.title}

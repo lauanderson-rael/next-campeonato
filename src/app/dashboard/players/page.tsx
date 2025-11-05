@@ -203,7 +203,7 @@ export default function PlayersPage() {
   }
 
   return (
-    <main className="flex flex-col items-center p-4 md:p-6">
+    <main className="flex flex-col items-center p-4 md:px-6">
       <h1 className="w-full text-2xl font-bold mb-4 text-center ">Jogadores</h1>
       <Card className="w-full max-w-4xl">
         <CardHeader className="flex justify-between items-center flex-row">

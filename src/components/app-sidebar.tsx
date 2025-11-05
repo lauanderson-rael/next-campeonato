@@ -12,6 +12,8 @@ import {
   Settings,
   Info,
   LogOut,
+  PanelLeft,
+  PanelLeftClose,
 } from "lucide-react";
 
 import {
@@ -23,7 +25,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   SidebarFooter,
 } from "@/components/ui/sidebar";
 
@@ -44,12 +45,15 @@ import {
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
 
+import { Button } from "@/components/ui/button";
+import ModalLogout from "./ModalLogout";
+
 // Menu items.
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
   { title: "Jogadores", url: "/dashboard/players", icon: Users },
   { title: "Times", url: "/dashboard/teams", icon: Shield },
-  { title: "Classes", url: "/dashboard/class", icon: School2 },
+  { title: "Turmas", url: "/dashboard/class", icon: School2 },
   { title: "Partidas", url: "#", icon: Calendar },
   {
     title: "Classificação",
@@ -61,11 +65,19 @@ const items = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { open } = useSidebar();
+  const { open, toggleSidebar } = useSidebar();
 
   return (
-    <Sidebar side="left" collapsible="icon" variant="sidebar" className="ml-3">
-      <SidebarTrigger className="ml-2 mt-1 text-gray-800 hidden md:flex hover:text-gray-950" />
+    <Sidebar side="left" collapsible="icon" variant="sidebar" className="ml-2">
+      {/* <SidebarTrigger className="ml-2 mt-1 text-gray-800 hidden md:flex hover:text-gray-950"   /> */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggleSidebar}
+        className="ml-2 mt-1 text-gray-800 hidden md:flex hover:text-gray-950 hover:bg-gray-100"
+      >
+        {open ? <PanelLeftClose /> : <PanelLeft />}
+      </Button>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Navegação principal</SidebarGroupLabel>
@@ -81,11 +93,21 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         asChild
                         isActive={isActive}
-                        className={isActive ? "border border-green-700" : ""}
+                        className={
+                          isActive
+                            ? "!bg-green-100 shadow-md shadow-green-700/20 "
+                            : ""
+                        }
                       >
                         <a href={item.url}>
                           <item.icon className="text-green-700 hover:text-green-800" />
-                          <span className="ml-2">{item.title}</span>
+                          <span
+                            className={
+                              isActive ? "ml-2 text-green-700" : "ml-2"
+                            }
+                          >
+                            {item.title}
+                          </span>
                         </a>
                       </SidebarMenuButton>
                     ) : (
@@ -97,12 +119,14 @@ export function AppSidebar() {
                               asChild
                               isActive={isActive}
                               className={
-                                isActive ? "border border-green-700" : ""
+                                isActive
+                                  ? "!bg-green-100 shadow-md shadow-green-700/20"
+                                  : ""
                               }
                             >
                               <a href={item.url}>
-                                <item.icon className="text-green-700 hover:text-green-800" />
-                                <span className="ml-2">{item.title}</span>
+                                <item.icon className=" text-green-700 hover:text-green-800" />
+                                <span className="ml-1">{item.title}</span>
                               </a>
                             </SidebarMenuButton>
                           </TooltipTrigger>
@@ -145,9 +169,10 @@ export function AppSidebar() {
                     <span>Ajuda</span>
                   </a>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                   <LogOut className="mr-2 text-green-700 hover:text-green-800" />
-                  <span>Sair do sistema</span>
+                  {/* <span>Sair do sistema</span> */}
+                  <ModalLogout />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
