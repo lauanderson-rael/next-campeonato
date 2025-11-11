@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pencil, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog";
 import {
   Table,
   TableHeader,
@@ -63,6 +64,11 @@ export default function PlayersPage() {
   });
   const [isEditing, setIsEditing] = useState(false);
 
+  // Exclusão
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [playerToDelete, setPlayerToDelete] = useState<Player | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -81,8 +87,13 @@ export default function PlayersPage() {
 
   // Buscar jogadores/times
   const fetchPlayers = async () => {
+    const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/players`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/players`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       setPlayers(data);
     } catch (error) {
@@ -92,8 +103,13 @@ export default function PlayersPage() {
     }
   };
   const fetchTeams = async () => {
+    const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/teams`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/teams`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       setTeams(data);
     } catch (error) {
@@ -116,11 +132,15 @@ export default function PlayersPage() {
     e.preventDefault();
     setIsSaving(true);
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/players`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             name: formData.name,
             age: Number(formData.age),
@@ -145,12 +165,30 @@ export default function PlayersPage() {
   };
 
   // Exclusão
-  const handleDelete = async (player: Player) => {
-    if (window.confirm(`Confirma exclusão de ${player.name}?`)) {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/players/${player.id}`, {
+  const handleDeleteClick = (player: Player) => {
+    setPlayerToDelete(player);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!playerToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      const token = localStorage.getItem("token");
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/players/${playerToDelete.id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       await fetchPlayers();
+      setDeleteDialogOpen(false);
+      setPlayerToDelete(null);
+    } catch (error) {
+      console.error("Erro ao excluir jogador:", error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -175,11 +213,15 @@ export default function PlayersPage() {
     e.preventDefault();
     setIsEditing(true);
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/players/${editFormData.id}`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             name: editFormData.name,
             age: Number(editFormData.age),
@@ -412,7 +454,7 @@ export default function PlayersPage() {
                               type="button"
                               aria-label="Excluir"
                               className="text-red-600 hover:text-red-800 p-2 rounded transition-colors"
-                              onClick={() => handleDelete(player)}
+                              onClick={() => handleDeleteClick(player)}
                             >
                               <Trash2 size={18} />
                             </button>
@@ -431,7 +473,7 @@ export default function PlayersPage() {
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => p - 1)}
                 >
-                  ← Anterior
+                  <ArrowLeft size={18} />
                 </Button>
                 <span className="px-2 text-sm">
                   Página {currentPage} de {totalPages}
@@ -442,13 +484,22 @@ export default function PlayersPage() {
                   disabled={currentPage === totalPages || totalPages === 0}
                   onClick={() => setCurrentPage((p) => p + 1)}
                 >
-                  Próxima →
+                  <ArrowRight size={18} />
                 </Button>
               </div>
             </>
           )}
         </CardContent>
       </Card>
+      
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="Confirmar Exclusão"
+        description={`Tem certeza que deseja excluir o jogador "${playerToDelete?.name}"? Esta ação não pode ser desfeita.`}
+        isDeleting={isDeleting}
+      />
     </main>
   );
 }

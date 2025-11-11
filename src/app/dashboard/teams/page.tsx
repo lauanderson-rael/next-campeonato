@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pencil, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog";
 import {
   Table,
   TableHeader,
@@ -47,6 +48,11 @@ export default function TeamsPage() {
   });
   const [isEditing, setIsEditing] = useState(false);
 
+  // Exclusão
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -65,8 +71,13 @@ export default function TeamsPage() {
 
   // Listagem
   const fetchTeams = async () => {
+    const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/teams`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/teams`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       setTeams(data);
     } catch (error) {
@@ -87,9 +98,13 @@ export default function TeamsPage() {
     e.preventDefault();
     setIsSaving(true);
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/teams`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(formData),
       });
       if (response.ok) {
@@ -108,12 +123,30 @@ export default function TeamsPage() {
   };
 
   // Exclusão
-  const handleDelete = async (team: Team) => {
-    if (window.confirm(`Confirma exclusão de ${team.name}?`)) {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/teams/${team.id}`, {
+  const handleDeleteClick = (team: Team) => {
+    setTeamToDelete(team);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!teamToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      const token = localStorage.getItem("token");
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/teams/${teamToDelete.id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       await fetchTeams();
+      setDeleteDialogOpen(false);
+      setTeamToDelete(null);
+    } catch (error) {
+      console.error("Erro ao excluir time:", error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -129,11 +162,15 @@ export default function TeamsPage() {
     e.preventDefault();
     setIsEditing(true);
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/teams/${editFormData.id}`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             name: editFormData.name,
             modality: editFormData.modality,
@@ -306,7 +343,7 @@ export default function TeamsPage() {
                               type="button"
                               aria-label="Excluir"
                               className="text-red-600 hover:text-red-800 p-2 rounded transition-colors"
-                              onClick={() => handleDelete(team)}
+                              onClick={() => handleDeleteClick(team)}
                             >
                               <Trash2 size={18} />
                             </button>
@@ -325,7 +362,7 @@ export default function TeamsPage() {
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => p - 1)}
                 >
-                  ← Anterior
+                  <ArrowLeft size={18} />
                 </Button>
                 <span className="px-2 text-sm">
                   Página {currentPage} de {totalPages}
@@ -336,13 +373,22 @@ export default function TeamsPage() {
                   disabled={currentPage === totalPages || totalPages === 0}
                   onClick={() => setCurrentPage((p) => p + 1)}
                 >
-                  Próxima →
+                  <ArrowRight size={18} />
                 </Button>
               </div>
             </>
           )}
         </CardContent>
       </Card>
+      
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="Confirmar Exclusão"
+        description={`Tem certeza que deseja excluir o time "${teamToDelete?.name}"? Esta ação não pode ser desfeita.`}
+        isDeleting={isDeleting}
+      />
     </main>
   );
 }

@@ -22,24 +22,21 @@ const mockTeams = [
   { position: 8, name: "Time H", points: 0 },
   { position: 9, name: "Time I", points: 0 },
   { position: 10, name: "Time J", points: 0 },
-  { position: 11, name: "Time K", points: 0 },
-  { position: 12, name: "Time L", points: 0 },
-  { position: 13, name: "Time M", points: 0 },
-  { position: 14, name: "Time N", points: 0 },
-  { position: 15, name: "Time O", points: 0 },
-  { position: 16, name: "Time P", points: 0 },
-  { position: 17, name: "Time Q", points: 0 },
 ];
 
 export default function RankingPage() {
   return (
     <div className="flex flex-col items-center m-4 md:m-6">
+      <h1 className="w-full text-2xl font-bold mb-4 text-center ">
+        {" "}
+        Tabela de Classificação
+      </h1>
       <Card className="w-full max-w-2xl">
-        <CardHeader>
+        {/* <CardHeader>
           <CardTitle className="text-center text-2xl font-bold ">
             Tabela de Classificação
           </CardTitle>
-        </CardHeader>
+        </CardHeader> */}
         <CardContent className="max-h-[60dvh] overflow-y-auto ">
           <Table>
             <TableHeader>

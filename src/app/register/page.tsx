@@ -11,8 +11,8 @@ import {
 
 export default function RegisterPage() {
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center">
-      <Card className="w-96">
+    <div className="flex px-4 h-screen w-screen flex-col items-center justify-center">
+      <Card className="w-full max-w-md px-2 py-8 shadow-xl">
         <CardHeader>
           <div className="flex flex-col items-center gap-2">
             <Image
@@ -22,7 +22,7 @@ export default function RegisterPage() {
               height={64}
               className="mb-2 drop-shadow-lg"
             />
-            <h1 className="text-center text-4xl font-bold text-green-600 mb-1 tracking-tight">
+            <h1 className="text-center text-4xl font-bold text-green-700 mb-1 tracking-tight">
               IFMA - Campeonatos
             </h1>
           </div>

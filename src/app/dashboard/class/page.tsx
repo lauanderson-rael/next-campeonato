@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pencil, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog";
 import {
   Table,
   TableHeader,
@@ -60,6 +61,11 @@ export default function ClassesPage() {
   });
   const [isEditing, setIsEditing] = useState(false);
 
+  // Exclusão
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [classToDelete, setClassToDelete] = useState<Class | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -78,8 +84,15 @@ export default function ClassesPage() {
 
   // Listagem
   const fetchClasses = async () => {
+    const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/classes`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/classes`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       setClasses(data);
     } catch (error) {
@@ -103,11 +116,15 @@ export default function ClassesPage() {
     e.preventDefault();
     setIsSaving(true);
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/classes`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             ...formData,
             year: Number(formData.year),
@@ -137,12 +154,30 @@ export default function ClassesPage() {
   };
 
   // Exclusão
-  const handleDelete = async (cls: Class) => {
-    if (window.confirm(`Confirma exclusão de ${cls.name}?`)) {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/classes/${cls.id}`, {
+  const handleDeleteClick = (cls: Class) => {
+    setClassToDelete(cls);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!classToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      const token = localStorage.getItem("token");
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/classes/${classToDelete.id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       await fetchClasses();
+      setDeleteDialogOpen(false);
+      setClassToDelete(null);
+    } catch (error) {
+      console.error("Erro ao excluir turma:", error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -168,11 +203,15 @@ export default function ClassesPage() {
     e.preventDefault();
     setIsEditing(true);
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/classes/${editFormData.id}`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             name: editFormData.name,
             year: Number(editFormData.year),
@@ -414,7 +453,7 @@ export default function ClassesPage() {
                               type="button"
                               aria-label="Excluir"
                               className="text-red-600 hover:text-red-800 p-2 rounded transition-colors"
-                              onClick={() => handleDelete(cls)}
+                              onClick={() => handleDeleteClick(cls)}
                             >
                               <Trash2 size={18} />
                             </button>
@@ -433,7 +472,7 @@ export default function ClassesPage() {
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => p - 1)}
                 >
-                  ← Anterior
+                  <ArrowLeft size={18} />
                 </Button>
                 <span className="px-2 text-sm">
                   Página {currentPage} de {totalPages}
@@ -444,13 +483,22 @@ export default function ClassesPage() {
                   disabled={currentPage === totalPages || totalPages === 0}
                   onClick={() => setCurrentPage((p) => p + 1)}
                 >
-                  Próxima →
+                  <ArrowRight size={18} />
                 </Button>
               </div>
             </>
           )}
         </CardContent>
       </Card>
+      
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="Confirmar Exclusão"
+        description={`Tem certeza que deseja excluir a turma "${classToDelete?.name}"? Esta ação não pode ser desfeita.`}
+        isDeleting={isDeleting}
+      />
     </main>
   );
 }

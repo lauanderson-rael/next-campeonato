@@ -4,7 +4,7 @@ import LoginForm from "../components/loginForm";
 
 export default function Home() {
   return (
-    <div className="flex flex-col px-4 justify-center items-center min-h-screen bg-gradient-to-br from-primary/10 to-secondary/20 animate-in fade-in duration-700">
+    <div className="flex flex-col px-4 justify-center items-center min-h-screen  animate-in fade-in duration-700">
       <Card className="w-full max-w-md p-8 shadow-xl border border-border bg-card/80 backdrop-blur-md flex flex-col items-center gap-6">
         <div className="flex flex-col items-center gap-2">
           <Image
