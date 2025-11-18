@@ -71,7 +71,7 @@ export default function Dashboard() {
       description:
         "Administre os torneios e eventos realizados pela instituição.",
       icon: <Trophy className="w-6 h-6 text-yellow-500" />,
-      href: "/dashboard/tournaments",
+      href: "/dashboard/championships",
     },
     {
       title: "Partidas",

@@ -24,11 +24,18 @@ import {
   TableCell,
   TableCaption,
 } from "@/components/ui/table";
+import { redirect } from "next/navigation";
 
 interface Team {
   id: number;
   name: string;
 }
+
+interface Class {
+  id: number;
+  name: string;
+}
+
 interface Player {
   id: number;
   name: string;
@@ -36,6 +43,7 @@ interface Player {
   classId: number;
   teamId: number;
   team?: Team;
+  class?: Class;
   createdAt?: string;
 }
 
@@ -43,6 +51,7 @@ export default function PlayersPage() {
   // Estados CRUD/Jogador
   const [players, setPlayers] = useState<Player[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [classes, setClasses] = useState<Class[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -116,9 +125,26 @@ export default function PlayersPage() {
       console.error("Erro ao buscar times:", error);
     }
   };
+
+  const fetchClasses = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/classes`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      setClasses(data);
+    } catch (error) {
+      console.error("Erro ao buscar turmas:", error);
+    }
+  };
+
   useEffect(() => {
     fetchPlayers();
     fetchTeams();
+    fetchClasses();
   }, []);
 
   // Cadastro
@@ -172,16 +198,19 @@ export default function PlayersPage() {
 
   const handleDeleteConfirm = async () => {
     if (!playerToDelete) return;
-    
+
     setIsDeleting(true);
     try {
       const token = localStorage.getItem("token");
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/players/${playerToDelete.id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/players/${playerToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       await fetchPlayers();
       setDeleteDialogOpen(false);
       setPlayerToDelete(null);
@@ -284,17 +313,23 @@ export default function PlayersPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="classId">ID da Turma</Label>
-                  <Input
+                  <Label htmlFor="classId">Turma</Label>
+                  <select
                     id="classId"
-                    type="number"
-                    placeholder="Ex: 1"
                     value={formData.classId}
                     onChange={(e) =>
                       handleFormChange("classId", e.target.value)
                     }
                     required
-                  />
+                    className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+                  >
+                    <option value="">Selecione a turma</option>
+                    {classes.map((cls) => (
+                      <option key={cls.id} value={cls.id}>
+                        {cls.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="teamId">Time</Label>
@@ -357,16 +392,23 @@ export default function PlayersPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-classId">ID da Turma</Label>
-                  <Input
+                  <Label htmlFor="edit-classId">Turma</Label>
+                  <select
                     id="edit-classId"
-                    type="number"
                     value={editFormData.classId}
                     onChange={(e) =>
                       handleEditFormChange("classId", e.target.value)
                     }
                     required
-                  />
+                    className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+                  >
+                    <option value="">Selecione a turma</option>
+                    {classes.map((cls) => (
+                      <option key={cls.id} value={cls.id}>
+                        {cls.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="edit-teamId">Time</Label>
@@ -414,7 +456,7 @@ export default function PlayersPage() {
                   <TableRow>
                     <TableHead>Nome</TableHead>
                     <TableHead>Idade</TableHead>
-                    <TableHead>ID da Turma</TableHead>
+                    <TableHead>Turma</TableHead>
                     <TableHead>Time</TableHead>
                     <TableHead>Data de Cadastro</TableHead>
                     <TableHead>Ações</TableHead>
@@ -435,7 +477,9 @@ export default function PlayersPage() {
                       <TableRow key={player.id}>
                         <TableCell>{player.name}</TableCell>
                         <TableCell>{player.age}</TableCell>
-                        <TableCell>{player.classId}</TableCell>
+                        <TableCell>
+                          {player.class?.name || player.classId}
+                        </TableCell>
                         <TableCell>
                           {player.team?.name || player.teamId}
                         </TableCell>
@@ -491,7 +535,7 @@ export default function PlayersPage() {
           )}
         </CardContent>
       </Card>
-      
+
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}

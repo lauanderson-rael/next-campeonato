@@ -14,6 +14,7 @@ import {
   LogOut,
   PanelLeft,
   PanelLeftClose,
+  Trophy,
 } from "lucide-react";
 
 import {
@@ -55,6 +56,7 @@ const items = [
   { title: "Times", url: "/dashboard/teams", icon: Shield },
   { title: "Turmas", url: "/dashboard/class", icon: School2 },
   { title: "Partidas", url: "#", icon: Calendar },
+  { title: "Campeonatos", url: "/dashboard/championships", icon: Trophy },
   {
     title: "Classificação",
     url: "/dashboard/ranking",
