@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SearchInput } from "@/components/search-input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, ArrowRight, Pencil, Trash2 } from "lucide-react";
 import {
@@ -67,11 +68,19 @@ export default function ClassesPage() {
   const [classToDelete, setClassToDelete] = useState<Class | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Busca
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  // Filtrar turmas por nome
+  const filteredClasses = classes.filter(cls =>
+    cls.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(classes.length / itemsPerPage);
-  const paginatedClasses = classes.slice(
+  const totalPages = Math.ceil(filteredClasses.length / itemsPerPage);
+  const paginatedClasses = filteredClasses.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -245,7 +254,15 @@ export default function ClassesPage() {
       <h1 className="w-full text-2xl font-bold mb-4 text-center">Turmas</h1>
       <Card className="w-full max-w-4xl">
         <CardHeader className="flex justify-between items-center flex-row">
-          <CardTitle>Listagem de Turmas</CardTitle>
+          <SearchInput
+            placeholder="Buscar turma pelo nome..."
+            value={searchTerm}
+            onChange={(value) => {
+              setSearchTerm(value);
+              setCurrentPage(1);
+            }}
+            className="max-w-md"
+          />
           {/* Modal de cadastro */}
           <Dialog open={modalOpen} onOpenChange={setModalOpen}>
             <DialogTrigger asChild>
@@ -412,7 +429,7 @@ export default function ClassesPage() {
             <>
               <Table>
                 <TableCaption>
-                  Classes cadastradas: {classes.length}
+                  {searchTerm ? `${filteredClasses.length} turma(s) encontrada(s)` : `Classes cadastradas: ${classes.length}`}
                 </TableCaption>
                 <TableHeader>
                   <TableRow>

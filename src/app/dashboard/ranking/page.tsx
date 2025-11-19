@@ -38,9 +38,11 @@ interface Championship {
 export default function RankingPage() {
   const searchParams = useSearchParams();
   const championshipId = searchParams.get("championshipId");
-  
+
   const [championships, setChampionships] = useState<Championship[]>([]);
-  const [selectedChampionshipId, setSelectedChampionshipId] = useState<string | null>(championshipId);
+  const [selectedChampionshipId, setSelectedChampionshipId] = useState<
+    string | null
+  >(championshipId);
   const [ranking, setRanking] = useState<RankingTeam[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -60,11 +62,14 @@ export default function RankingPage() {
   const fetchChampionships = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/championships`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/championships`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const data = await res.json();
       setChampionships(data);
       if (data.length > 0 && !selectedChampionshipId) {
@@ -79,11 +84,14 @@ export default function RankingPage() {
     setIsLoading(true);
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/championships/${id}/ranking`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/championships/${id}/ranking`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const data = await res.json();
       setRanking(data);
     } catch (error) {
@@ -94,17 +102,21 @@ export default function RankingPage() {
     }
   };
 
-  const selectedChampionship = championships.find(c => String(c.id) === selectedChampionshipId);
+  const selectedChampionship = championships.find(
+    (c) => String(c.id) === selectedChampionshipId
+  );
 
   return (
     <div className="flex flex-col items-center m-4 md:m-6">
       <h1 className="w-full text-2xl font-bold mb-4 text-center">
         Tabela de Classificação
       </h1>
-      
+
       {championships.length > 0 && (
-        <div className="w-full max-w-2xl mb-4">
-          <label className="block text-sm font-medium mb-2">Selecione o Campeonato:</label>
+        <div className="w-full max-w-4xl mb-4">
+          <label className="block text-sm font-medium mb-2">
+            Selecione o Campeonato:
+          </label>
           <select
             value={selectedChampionshipId || ""}
             onChange={(e) => setSelectedChampionshipId(e.target.value)}
@@ -123,7 +135,9 @@ export default function RankingPage() {
       <Card className="w-full max-w-4xl">
         <CardHeader>
           <CardTitle className="text-center">
-            {selectedChampionship ? `${selectedChampionship.name} - ${selectedChampionship.modality}` : "Selecione um campeonato"}
+            {selectedChampionship
+              ? `${selectedChampionship.name} - ${selectedChampionship.modality}`
+              : "Selecione um campeonato"}
           </CardTitle>
         </CardHeader>
         <CardContent className="max-h-[60dvh] overflow-y-auto">
@@ -131,7 +145,9 @@ export default function RankingPage() {
             <p className="text-center text-gray-500">Carregando ranking...</p>
           ) : ranking.length === 0 ? (
             <p className="text-center text-gray-500">
-              {selectedChampionshipId ? "Nenhum resultado encontrado para este campeonato." : "Selecione um campeonato para ver o ranking."}
+              {selectedChampionshipId
+                ? "Nenhum resultado encontrado para este campeonato."
+                : "Selecione um campeonato para ver o ranking."}
             </p>
           ) : (
             <Table>
@@ -158,17 +174,29 @@ export default function RankingPage() {
                     <TableCell className="text-center font-medium">
                       {team.position}º
                     </TableCell>
-                    <TableCell className="font-medium">{team.teamName}</TableCell>
+                    <TableCell className="font-medium">
+                      {team.teamName}
+                    </TableCell>
                     <TableCell className="text-center font-bold text-green-600">
                       {team.points}
                     </TableCell>
-                    <TableCell className="text-center">{team.matchesPlayed}</TableCell>
+                    <TableCell className="text-center">
+                      {team.matchesPlayed}
+                    </TableCell>
                     <TableCell className="text-center">{team.wins}</TableCell>
                     <TableCell className="text-center">{team.draws}</TableCell>
                     <TableCell className="text-center">{team.losses}</TableCell>
-                    <TableCell className="text-center">{team.goalsFor}</TableCell>
-                    <TableCell className="text-center">{team.goalsAgainst}</TableCell>
-                    <TableCell className="text-center">{team.goalDifference >= 0 ? `+${team.goalDifference}` : team.goalDifference}</TableCell>
+                    <TableCell className="text-center">
+                      {team.goalsFor}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {team.goalsAgainst}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {team.goalDifference >= 0
+                        ? `+${team.goalDifference}`
+                        : team.goalDifference}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

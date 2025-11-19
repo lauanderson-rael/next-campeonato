@@ -35,14 +35,14 @@ export default function Header() {
           height={36}
           className="shadow-md hidden md:flex ml-2"
         />
-        <h1 className="text-md md:text-2xl font-bold text-white tracking-tight">
-          Sistema de Campeonatos
+        <h1 className="text-md md:text-2xl font-bold text-white">
+          IFMA Campeonatos
         </h1>
       </div>
 
       {/* Nome do usuário com ícone */}
-      <button 
-        onClick={() => router.push('/dashboard/profile')}
+      <button
+        onClick={() => router.push("/dashboard/profile")}
         className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer"
       >
         <User size={18} className="text-white" />

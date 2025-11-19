@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SearchInput } from "@/components/search-input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, ArrowRight, Pencil, Trash2 } from "lucide-react";
 import {
@@ -54,11 +55,19 @@ export default function TeamsPage() {
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Busca
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  // Filtrar times por nome
+  const filteredTeams = teams.filter(team =>
+    team.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
-  const totalPages = Math.ceil(teams.length / itemsPerPage);
-  const paginatedTeams = teams.slice(
+  const totalPages = Math.ceil(filteredTeams.length / itemsPerPage);
+  const paginatedTeams = filteredTeams.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -201,7 +210,15 @@ export default function TeamsPage() {
       <h1 className="w-full text-2xl font-bold mb-4 text-center ">Times</h1>
       <Card className="w-full max-w-4xl ">
         <CardHeader className="flex justify-between items-center flex-row">
-          <CardTitle>Listagem de Times</CardTitle>
+          <SearchInput
+            placeholder="Buscar time pelo nome..."
+            value={searchTerm}
+            onChange={(value) => {
+              setSearchTerm(value);
+              setCurrentPage(1);
+            }}
+            className="max-w-md"
+          />
           {/* Modal de cadastro */}
           <Dialog open={modalOpen} onOpenChange={setModalOpen}>
             <DialogTrigger asChild>
@@ -309,7 +326,9 @@ export default function TeamsPage() {
           ) : (
             <>
               <Table>
-                <TableCaption>Times cadastrados: {teams.length}</TableCaption>
+                <TableCaption>
+                  {searchTerm ? `${filteredTeams.length} time(s) encontrado(s)` : `Times cadastrados: ${teams.length}`}
+                </TableCaption>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nome</TableHead>

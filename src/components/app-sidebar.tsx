@@ -57,14 +57,14 @@ const items = [
   { title: "Jogadores", url: "/dashboard/players", icon: Users },
   { title: "Times", url: "/dashboard/teams", icon: Shield },
   { title: "Turmas", url: "/dashboard/class", icon: School2 },
-  { title: "Partidas", url: "#", icon: Calendar },
+  { title: "Partidas", url: "/dashboard/matches", icon: Calendar },
   { title: "Campeonatos", url: "/dashboard/championships", icon: Trophy },
   {
     title: "Classificação",
     url: "/dashboard/ranking",
     icon: ChartNoAxesColumn,
   },
-  { title: "Relatórios", url: "#", icon: Newspaper },
+  { title: "Relatórios", url: "/dashboard/reports", icon: Newspaper },
 ];
 
 export function AppSidebar() {

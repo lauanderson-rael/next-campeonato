@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { User, Mail, Shield, Calendar } from "lucide-react";
+import { User, Mail, Shield } from "lucide-react";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -51,17 +51,19 @@ export default function ProfilePage() {
               <Shield size={20} className="text-gray-600" />
               <div>
                 <p className="text-sm text-gray-500">Função</p>
-                <p className="font-medium text-gray-800 capitalize">{user.role}</p>
+                <p className="font-medium text-gray-800 capitalize">
+                  {user.role}
+                </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+            {/* <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
               <Calendar size={20} className="text-gray-600" />
               <div>
                 <p className="text-sm text-gray-500">ID do Usuário</p>
                 <p className="font-medium text-gray-800">#{user.id}</p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

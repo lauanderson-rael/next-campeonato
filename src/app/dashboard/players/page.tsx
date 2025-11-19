@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SearchInput } from "@/components/search-input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, ArrowRight, Pencil, Trash2 } from "lucide-react";
 import {
@@ -25,7 +26,7 @@ import {
   TableCaption,
 } from "@/components/ui/table";
 import { redirect } from "next/navigation";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 interface Team {
   id: number;
@@ -79,11 +80,19 @@ export default function PlayersPage() {
   const [playerToDelete, setPlayerToDelete] = useState<Player | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Busca
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filtrar jogadores por nome
+  const filteredPlayers = players.filter((player) =>
+    player.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
-  const totalPages = Math.ceil(players.length / itemsPerPage);
-  const paginatedPlayers = players.slice(
+  const totalPages = Math.ceil(filteredPlayers.length / itemsPerPage);
+  const paginatedPlayers = filteredPlayers.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -180,12 +189,12 @@ export default function PlayersPage() {
         setFormData({ name: "", age: "", classId: "", teamId: "" });
         setModalOpen(false);
         await fetchPlayers();
-        toast.success('Jogador adicionado com sucesso!');
+        toast.success("Jogador adicionado com sucesso!");
       } else {
-        toast.error('Erro ao cadastrar jogador');
+        toast.error("Erro ao cadastrar jogador");
       }
     } catch (error) {
-      toast.error('Erro ao conectar com o servidor');
+      toast.error("Erro ao conectar com o servidor");
       console.error("Erro ao cadastrar jogador:", error);
     } finally {
       setIsSaving(false);
@@ -216,9 +225,9 @@ export default function PlayersPage() {
       await fetchPlayers();
       setDeleteDialogOpen(false);
       setPlayerToDelete(null);
-      toast.success('Jogador excluído com sucesso!');
+      toast.success("Jogador excluído com sucesso!");
     } catch (error) {
-      toast.error('Erro ao excluir jogador');
+      toast.error("Erro ao excluir jogador");
       console.error("Erro ao excluir jogador:", error);
     } finally {
       setIsDeleting(false);
@@ -266,12 +275,12 @@ export default function PlayersPage() {
       if (response.ok) {
         setEditModalOpen(false);
         await fetchPlayers();
-        toast.success('Jogador editado com sucesso!');
+        toast.success("Jogador editado com sucesso!");
       } else {
-        toast.error('Erro ao editar jogador!');
+        toast.error("Erro ao editar jogador!");
       }
     } catch (error) {
-      toast.error('Erro ao conectar com o servidor');
+      toast.error("Erro ao conectar com o servidor");
       console.error("Erro ao editar jogador:", error);
     } finally {
       setIsEditing(false);
@@ -283,7 +292,18 @@ export default function PlayersPage() {
       <h1 className="w-full text-2xl font-bold mb-4 text-center ">Jogadores</h1>
       <Card className="w-full max-w-4xl">
         <CardHeader className="flex justify-between items-center flex-row">
-          <CardTitle>Listagem de Jogadores</CardTitle>
+          {/* <CardTitle>Listagem de Jogadores</CardTitle> */}
+
+          <SearchInput
+            placeholder="Buscar jogador pelo nome..."
+            value={searchTerm}
+            onChange={(value) => {
+              setSearchTerm(value);
+              setCurrentPage(1);
+            }}
+            className="max-w-md"
+          />
+
           {/* Modal de cadastro */}
           <Dialog open={modalOpen} onOpenChange={setModalOpen}>
             <DialogTrigger asChild>
@@ -455,7 +475,9 @@ export default function PlayersPage() {
             <>
               <Table>
                 <TableCaption>
-                  Jogadores cadastrados: {players.length}
+                  {searchTerm
+                    ? `${filteredPlayers.length} jogador(es) encontrado(s)`
+                    : `Jogadores cadastrados: ${players.length}`}
                 </TableCaption>
                 <TableHeader>
                   <TableRow>
