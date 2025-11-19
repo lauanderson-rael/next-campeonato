@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import {
   Card,
   CardContent,
@@ -23,14 +24,13 @@ export default function RecoverPasswordPage() {
       });
 
       if (res.ok) {
-        setMessage("Um link de recuperação foi enviado ao seu e-mail.");
+        toast.success("Um link de recuperação foi enviado ao seu e-mail.");
+        setMessage("");
       } else {
-        setMessage(
-          "Erro ao enviar o link. Verifique o e-mail e tente novamente."
-        );
+        toast.error("Erro ao enviar o link. Verifique o e-mail e tente novamente.");
       }
     } catch (err) {
-      setMessage("Ocorreu um erro inesperado.");
+      toast.error("Ocorreu um erro inesperado.");
       console.error("Erro ao enviar o link de recuperação:", err);
     }
   };

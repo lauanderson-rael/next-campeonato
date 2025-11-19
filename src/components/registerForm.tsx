@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,12 +29,13 @@ export function RegisterForm() {
     try {
       const success = await register(data.name, data.email, data.password);
       if (success) {
+        toast.success("Conta criada com sucesso!");
         router.push("/dashboard");
       } else {
-        setError("Erro ao criar conta. Verifique os dados e tente novamente.");
+        toast.error("Erro ao criar conta. Verifique os dados e tente novamente.");
       }
     } catch (err) {
-      setError("Erro ao criar conta. Tente novamente.");
+      toast.error("Erro ao criar conta. Tente novamente.");
       console.log(err);
     } finally {
       setIsLoading(false);
