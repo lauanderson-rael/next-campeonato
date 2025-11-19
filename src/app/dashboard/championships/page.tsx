@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, ArrowRight, Trash2, Eye, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Trash2, Eye, Plus, Edit } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +35,8 @@ interface Championship {
   id: number;
   name: string;
   year: number;
+  modality: string;
+  teams?: Team[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -47,8 +49,19 @@ export default function ChampionshipsPage() {
   const [formData, setFormData] = useState({
     name: "",
     year: "",
+    modality: "",
   });
   const [isSaving, setIsSaving] = useState(false);
+
+  // Edição
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [championshipToEdit, setChampionshipToEdit] = useState<Championship | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    year: "",
+    modality: "",
+  });
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Modal de times
   const [teamsModalOpen, setTeamsModalOpen] = useState(false);
@@ -137,11 +150,12 @@ export default function ChampionshipsPage() {
           body: JSON.stringify({
             name: formData.name,
             year: Number(formData.year),
+            modality: formData.modality,
           }),
         }
       );
       if (response.ok) {
-        setFormData({ name: "", year: "" });
+        setFormData({ name: "", year: "", modality: "" });
         setModalOpen(false);
         await fetchChampionships();
       } else {
@@ -199,6 +213,53 @@ export default function ChampionshipsPage() {
     );
   };
 
+  const handleEditClick = (championship: Championship) => {
+    setChampionshipToEdit(championship);
+    setEditFormData({
+      name: championship.name,
+      year: String(championship.year),
+      modality: championship.modality,
+    });
+    setEditModalOpen(true);
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!championshipToEdit) return;
+
+    setIsUpdating(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/championships/${championshipToEdit.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: editFormData.name,
+            year: Number(editFormData.year),
+            modality: editFormData.modality,
+          }),
+        }
+      );
+      if (response.ok) {
+        setEditModalOpen(false);
+        setChampionshipToEdit(null);
+        await fetchChampionships();
+      } else {
+        alert("Erro ao atualizar campeonato");
+      }
+    } catch (error) {
+      alert("Erro ao conectar com o servidor");
+      console.error("Erro ao atualizar campeonato:", error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const handleGenerateMatches = async () => {
     if (!selectedChampionship || selectedTeams.length < 2) {
       alert("Selecione pelo menos 2 times");
@@ -209,7 +270,7 @@ export default function ChampionshipsPage() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/championships/${selectedChampionship.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/championships/${selectedChampionship.id}/generate-matches`,
         {
           method: "POST",
           headers: {
@@ -276,6 +337,20 @@ export default function ChampionshipsPage() {
                     required
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="modality">Modalidade</Label>
+                  <select
+                    id="modality"
+                    value={formData.modality}
+                    onChange={(e) => handleFormChange("modality", e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    required
+                  >
+                    <option value="">Selecione a modalidade</option>
+                    <option value="Futebol">Futebol</option>
+                    <option value="Vôlei">Vôlei</option>
+                  </select>
+                </div>
                 <DialogFooter>
                   <Button
                     type="submit"
@@ -303,6 +378,7 @@ export default function ChampionshipsPage() {
                   <TableRow>
                     <TableHead>Nome</TableHead>
                     <TableHead>Ano</TableHead>
+                    <TableHead>Modalidade</TableHead>
                     <TableHead>Data de Criação</TableHead>
                     <TableHead>Ações</TableHead>
                   </TableRow>
@@ -311,7 +387,7 @@ export default function ChampionshipsPage() {
                   {paginatedChampionships.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={4}
+                        colSpan={5}
                         className="text-center text-gray-500"
                       >
                         Nenhum campeonato cadastrado ainda.
@@ -322,9 +398,18 @@ export default function ChampionshipsPage() {
                       <TableRow key={championship.id}>
                         <TableCell>{championship.name}</TableCell>
                         <TableCell>{championship.year}</TableCell>
+                        <TableCell>{championship.modality}</TableCell>
                         <TableCell>{formatDate(championship.createdAt)}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
+                            <button
+                              type="button"
+                              aria-label="Editar"
+                              className="text-yellow-600 hover:text-yellow-800 p-2 rounded transition-colors"
+                              onClick={() => handleEditClick(championship)}
+                            >
+                              <Edit size={18} />
+                            </button>
                             <button
                               type="button"
                               aria-label="Adicionar times"
@@ -391,6 +476,61 @@ export default function ChampionshipsPage() {
         description={`Tem certeza que deseja excluir o campeonato "${championshipToDelete?.name}"? Esta ação não pode ser desfeita.`}
         isDeleting={isDeleting}
       />
+
+      {/* Modal de edição */}
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Campeonato</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditSubmit} className="space-y-4 mt-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Nome do Campeonato</Label>
+              <Input
+                id="edit-name"
+                placeholder="Ex: Copa Verde da Vida"
+                value={editFormData.name}
+                onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-year">Ano</Label>
+              <Input
+                id="edit-year"
+                type="number"
+                placeholder="Ex: 2025"
+                value={editFormData.year}
+                onChange={(e) => setEditFormData({ ...editFormData, year: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-modality">Modalidade</Label>
+              <select
+                id="edit-modality"
+                value={editFormData.modality}
+                onChange={(e) => setEditFormData({ ...editFormData, modality: e.target.value })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                required
+              >
+                <option value="">Selecione a modalidade</option>
+                <option value="Futebol">Futebol</option>
+                <option value="Vôlei">Vôlei</option>
+              </select>
+            </div>
+            <DialogFooter>
+              <Button
+                type="submit"
+                className="bg-green-700 hover:bg-green-800 w-full"
+                disabled={isUpdating}
+              >
+                {isUpdating ? "Atualizando..." : "Atualizar"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Modal de times */}
       <Dialog open={teamsModalOpen} onOpenChange={setTeamsModalOpen}>
