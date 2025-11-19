@@ -4,7 +4,7 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
 export default function MatchesPage() {
   return (
-    <div className="flex flex-col items-center m-4 md:m-6">
+    <div className="flex flex-col items-center m-4 md:m-6 ">
       <h1 className="w-full text-2xl font-bold mb-4 text-center">Partidas</h1>
 
       <Card className="w-full max-w-4xl">

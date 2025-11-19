@@ -5,7 +5,7 @@ import LoginForm from "../components/loginForm";
 export default function Home() {
   return (
     <div className="flex flex-col px-4 justify-center items-center min-h-screen  animate-in fade-in duration-700">
-      <Card className="w-full max-w-md p-8 shadow-xl border border-border bg-card/80 backdrop-blur-md flex flex-col items-center gap-6">
+      <Card className="w-full max-w-md p-8 shadow-xl border border-border bg-card/80 backdrop-blur-md flex flex-col items-center gap-2">
         <div className="flex flex-col items-center gap-2">
           <Image
             src="/logo-if.png"
@@ -15,10 +15,14 @@ export default function Home() {
             className="mb-2 drop-shadow-lg "
           />
           <h1 className="text-center   text-4xl font-bold text-green-700 mb-1 tracking-tight">
-            IFMA - Campeonatos
+            IFMA Campeonatos
           </h1>
         </div>
-        <p className="text-muted-foreground text-center text-base">
+        <h1 className="text-center text-xl font-bold  mb-1 tracking-tight">
+          Entrar
+        </h1>
+
+        <p className="text-muted-foreground text-center text-sm">
           Gerencie campeonatos de forma simples, rápida e segura.
         </p>
         <div className="w-full flex flex-col items-center mt-4">

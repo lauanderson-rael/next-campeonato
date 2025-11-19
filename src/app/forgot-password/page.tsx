@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import {
   Card,
   CardContent,
@@ -23,14 +24,15 @@ export default function RecoverPasswordPage() {
       });
 
       if (res.ok) {
-        setMessage("Um link de recuperação foi enviado ao seu e-mail.");
+        toast.success("Um link de recuperação foi enviado ao seu e-mail.");
+        setMessage("");
       } else {
-        setMessage(
+        toast.error(
           "Erro ao enviar o link. Verifique o e-mail e tente novamente."
         );
       }
     } catch (err) {
-      setMessage("Ocorreu um erro inesperado.");
+      toast.error("Ocorreu um erro inesperado.");
       console.error("Erro ao enviar o link de recuperação:", err);
     }
   };
@@ -47,10 +49,13 @@ export default function RecoverPasswordPage() {
               height={64}
               className="mb-2 drop-shadow-lg"
             />
-            <h1 className="text-center text-3xl font-bold text-green-700 mb-1 tracking-tight">
-              Recuperar senha
+            <h1 className="text-center text-4xl font-bold text-green-700 mb-1 tracking-tight">
+              IFMA Campeonatos
             </h1>
           </div>
+          <h1 className="text-center text-xl font-bold  mb-1 tracking-tight">
+            Recuperar Senha
+          </h1>
           <CardDescription className="text-center">
             Digite o e-mail cadastrado para receber o link de redefinição
           </CardDescription>

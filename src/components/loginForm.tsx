@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,12 +85,13 @@ export default function LoginForm() {
         // Salvar token e usuário
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
+        toast.success("Login realizado com sucesso!");
         router.push("/dashboard");
       } else {
-        setError("Erro ao fazer login com Google");
+        toast.error("Erro ao fazer login com Google");
       }
     } catch (err) {
-      setError("Erro ao processar login do Google");
+      toast.error("Erro ao processar login do Google");
       console.log(err);
     } finally {
       setLoading(false);
@@ -104,12 +106,13 @@ export default function LoginForm() {
     try {
       const success = await login(email, password);
       if (success) {
+        toast.success("Login realizado com sucesso!");
         router.push("/dashboard");
       } else {
-        setError("Email ou senha inválidos.");
+        toast.error("Email ou senha inválidos.");
       }
     } catch (err) {
-      setError("Erro ao fazer login. Tente novamente.");
+      toast.error("Erro ao fazer login. Tente novamente.");
       console.log(err);
     } finally {
       setLoading(false);
@@ -121,14 +124,14 @@ export default function LoginForm() {
     console.log(clientId);
     console.log(!clientId);
     if (!clientId) {
-      setError("Google OAuth não configurado.");
+      toast.error("Google OAuth não configurado.");
       return;
     }
 
     if (window.google && window.google.accounts) {
       window.google.accounts.id.prompt();
     } else {
-      setError("Google OAuth não carregado. Tente novamente.");
+      toast.error("Google OAuth não carregado. Tente novamente.");
     }
   }
 

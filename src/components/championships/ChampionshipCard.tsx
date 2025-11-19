@@ -31,9 +31,15 @@ function formatDate(date?: string | null) {
   return d.toLocaleDateString("pt-BR");
 }
 
-export function ChampionshipCard({ championship, onEdit, onTeams, onDelete }: ChampionshipCardProps) {
+export function ChampionshipCard({
+  championship,
+  onEdit,
+  onTeams,
+  onDelete,
+}: ChampionshipCardProps) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-lg transition-all relative border-t-8 border-green-600 hover:bg-green-50 duration-300 ">
+      {/* <div className="absolute top-0 left-0 right-0 h-1 bg-green-600 rounded-t-xl"></div> */}
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">{championship.name}</CardTitle>
         <div className="flex justify-between text-sm text-gray-600">
@@ -67,7 +73,9 @@ export function ChampionshipCard({ championship, onEdit, onTeams, onDelete }: Ch
           <button
             type="button"
             className="flex items-center gap-1 text-blue-600 hover:text-blue-800 px-2 py-1 rounded transition-colors hover:bg-blue-50 text-xs"
-            onClick={() => (window.location.href = `/dashboard/championships/${championship.id}/matches`)}
+            onClick={() =>
+              (window.location.href = `/dashboard/championships/${championship.id}/matches`)
+            }
           >
             <Eye size={14} />
             <span>Partidas</span>

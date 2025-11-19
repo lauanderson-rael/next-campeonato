@@ -96,23 +96,26 @@ export default function Dashboard() {
 
   return (
     <div>
-      <main className="flex-1 p-4 md:px-12">
+      <main className="flex-1 p-4 md:px-12 ">
         <h1 className="text-2xl font-bold mb-4 text-center">
           Dashboard Principal
         </h1>
         <p className="text-gray-600 mb-6 text-sm md:text-lg text-center">
           Sistema de gestão esportiva — controle total do seu campeonato.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {cards.map((c) => (
-            <DashboardCard
-              key={c.title}
-              title={c.title}
-              description={c.description}
-              icon={c.icon}
-              href={c.href || "/"}
-            />
-          ))}
+
+        <div className="md:flex md:justify-center ">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:max-w-4xl">
+            {cards.map((c) => (
+              <DashboardCard
+                key={c.title}
+                title={c.title}
+                description={c.description}
+                icon={c.icon}
+                href={c.href || "/"}
+              />
+            ))}
+          </div>
         </div>
       </main>
     </div>
