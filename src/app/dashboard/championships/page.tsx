@@ -77,8 +77,9 @@ export default function ChampionshipsPage() {
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
-  const totalPages = Math.ceil(championships.length / itemsPerPage);
-  const paginatedChampionships = championships.slice(
+  const championshipsArray = Array.isArray(championships) ? championships : [];
+  const totalPages = Math.ceil(championshipsArray.length / itemsPerPage);
+  const paginatedChampionships = championshipsArray.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -98,10 +99,17 @@ export default function ChampionshipsPage() {
           Authorization: `Bearer ${token}`,
         },
       });
+      
+      if (!res.ok) {
+        throw new Error(`Erro ${res.status}: ${res.statusText}`);
+      }
+      
       const data = await res.json();
-      setChampionships(data);
+      // Garantir que sempre seja um array
+      setChampionships(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Erro ao buscar campeonatos:", error);
+      setChampionships([]); // Garantir que seja array vazio em caso de erro
     } finally {
       setIsLoading(false);
     }
@@ -372,7 +380,7 @@ export default function ChampionshipsPage() {
             <>
               <Table>
                 <TableCaption>
-                  Campeonatos cadastrados: {championships.length}
+                  Campeonatos cadastrados: {championshipsArray.length}
                 </TableCaption>
                 <TableHeader>
                   <TableRow>
