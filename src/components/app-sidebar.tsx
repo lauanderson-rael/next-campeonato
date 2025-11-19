@@ -15,6 +15,8 @@ import {
   PanelLeft,
   PanelLeftClose,
   Trophy,
+  Menu,
+  X,
 } from "lucide-react";
 
 import {
@@ -76,9 +78,9 @@ export function AppSidebar() {
         variant="ghost"
         size="icon"
         onClick={toggleSidebar}
-        className="ml-2 mt-1 text-gray-800 hidden md:flex hover:text-gray-950 hover:bg-gray-100"
+        className="ml-2 mt-2 text-gray-800 hidden md:flex hover:text-gray-950 hover:bg-gray-100"
       >
-        {open ? <PanelLeftClose /> : <PanelLeft />}
+        {open ? <X /> : <Menu />}
       </Button>
       <SidebarContent>
         <SidebarGroup>
@@ -163,7 +165,9 @@ export function AppSidebar() {
               >
                 <DropdownMenuItem>
                   <User2 className="mr-2 text-green-700 hover:text-green-800" />
-                  <span>Perfil</span>
+                  <a href="/dashboard/profile">
+                    <span>Perfil</span>
+                  </a>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Info className="mr-2 text-green-700 hover:text-green-800" />

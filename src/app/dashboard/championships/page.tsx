@@ -261,11 +261,12 @@ export default function ChampionshipsPage() {
         setEditModalOpen(false);
         setChampionshipToEdit(null);
         await fetchChampionships();
+        toast.success('Campeonato editado com sucesso!');
       } else {
-        alert("Erro ao atualizar campeonato");
+        toast.error('Erro ao atualizar campeonato');
       }
     } catch (error) {
-      alert("Erro ao conectar com o servidor");
+      toast.error('Erro ao conectar com o servidor');
       console.error("Erro ao atualizar campeonato:", error);
     } finally {
       setIsUpdating(false);

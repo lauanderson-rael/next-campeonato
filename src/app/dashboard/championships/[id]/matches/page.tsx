@@ -23,6 +23,7 @@ import {
   TableCell,
   TableCaption,
 } from "@/components/ui/table";
+import { toast } from 'react-toastify';
 
 interface Team {
   id: number;
@@ -207,12 +208,12 @@ export default function ChampionshipMatchesPage() {
       if (response.ok) {
         setResultModalOpen(false);
         await fetchMatches();
-        alert("Resultado registrado com sucesso!");
+        toast.success("Resultado registrado com sucesso!");
       } else {
-        alert("Erro ao registrar resultado");
+        toast.error("Erro ao registrar resultado");
       }
     } catch (error) {
-      alert("Erro ao conectar com o servidor");
+      toast.error("Erro ao conectar com o servidor");
       console.error("Erro ao registrar resultado:", error);
     } finally {
       setIsSaving(false);

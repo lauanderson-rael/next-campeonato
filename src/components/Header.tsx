@@ -3,10 +3,12 @@ import { useSidebar } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { Menu, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const { setOpenMobile } = useSidebar();
   const { user } = useAuth();
+  const router = useRouter();
 
   const formatName = (fullName: string) => {
     const names = fullName.trim().split(" ");
@@ -39,12 +41,15 @@ export default function Header() {
       </div>
 
       {/* Nome do usuário com ícone */}
-      <div className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-lg backdrop-blur-sm">
+      <button 
+        onClick={() => router.push('/dashboard/profile')}
+        className="flex items-center gap-2 bg-white/10 px-3 py-2 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer"
+      >
         <User size={18} className="text-white" />
         <span className="text-white font-medium text-sm md:text-base">
           {user?.name ? formatName(user.name) : "Usuário"}
         </span>
-      </div>
+      </button>
     </div>
   );
 }
