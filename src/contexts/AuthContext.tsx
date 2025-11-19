@@ -125,11 +125,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return true;
       } else {
         const error = await response.json();
-        console.error("Erro no registro:", error.error);
+        console.log("Erro no registro:", error.error);
         return false;
       }
     } catch (error) {
-      console.error("Erro na requisição de registro:", error);
+      console.log("Erro na requisição de registro:", error);
       return false;
     }
   };

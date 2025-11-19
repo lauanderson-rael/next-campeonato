@@ -25,6 +25,7 @@ import {
   TableCaption,
 } from "@/components/ui/table";
 import { redirect } from "next/navigation";
+import { toast } from 'react-toastify';
 
 interface Team {
   id: number;
@@ -179,11 +180,12 @@ export default function PlayersPage() {
         setFormData({ name: "", age: "", classId: "", teamId: "" });
         setModalOpen(false);
         await fetchPlayers();
+        toast.success('Jogador adicionado com sucesso!');
       } else {
-        alert("Erro ao cadastrar jogador");
+        toast.error('Erro ao cadastrar jogador');
       }
     } catch (error) {
-      alert("Erro ao conectar com o servidor");
+      toast.error('Erro ao conectar com o servidor');
       console.error("Erro ao cadastrar jogador:", error);
     } finally {
       setIsSaving(false);
@@ -214,7 +216,9 @@ export default function PlayersPage() {
       await fetchPlayers();
       setDeleteDialogOpen(false);
       setPlayerToDelete(null);
+      toast.success('Jogador excluído com sucesso!');
     } catch (error) {
+      toast.error('Erro ao excluir jogador');
       console.error("Erro ao excluir jogador:", error);
     } finally {
       setIsDeleting(false);
@@ -262,11 +266,12 @@ export default function PlayersPage() {
       if (response.ok) {
         setEditModalOpen(false);
         await fetchPlayers();
+        toast.success('Jogador editado com sucesso!');
       } else {
-        alert("Erro ao editar jogador!");
+        toast.error('Erro ao editar jogador!');
       }
     } catch (error) {
-      alert("Erro ao conectar com o servidor");
+      toast.error('Erro ao conectar com o servidor');
       console.error("Erro ao editar jogador:", error);
     } finally {
       setIsEditing(false);

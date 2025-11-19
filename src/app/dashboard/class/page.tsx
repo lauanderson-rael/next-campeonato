@@ -24,6 +24,7 @@ import {
   TableCell,
   TableCaption,
 } from "@/components/ui/table";
+import { toast } from 'react-toastify';
 
 interface Class {
   id: number;
@@ -142,11 +143,12 @@ export default function ClassesPage() {
         });
         setModalOpen(false);
         await fetchClasses();
+        toast.success('Turma adicionada com sucesso!');
       } else {
-        alert("Erro ao cadastrar classe");
+        toast.error('Erro ao cadastrar turma');
       }
     } catch (error) {
-      alert("Erro ao conectar com o servidor");
+      toast.error('Erro ao conectar com o servidor');
       console.error("Erro ao cadastrar classe:", error);
     } finally {
       setIsSaving(false);
@@ -174,7 +176,9 @@ export default function ClassesPage() {
       await fetchClasses();
       setDeleteDialogOpen(false);
       setClassToDelete(null);
+      toast.success('Turma excluída com sucesso!');
     } catch (error) {
+      toast.error('Erro ao excluir turma');
       console.error("Erro ao excluir turma:", error);
     } finally {
       setIsDeleting(false);
@@ -224,11 +228,12 @@ export default function ClassesPage() {
       if (response.ok) {
         setEditModalOpen(false);
         await fetchClasses();
+        toast.success('Turma editada com sucesso!');
       } else {
-        alert("Erro ao editar turma!");
+        toast.error('Erro ao editar turma!');
       }
     } catch (error) {
-      alert("Erro ao conectar com o servidor");
+      toast.error('Erro ao conectar com o servidor');
       console.error("Erro ao editar turma:", error);
     } finally {
       setIsEditing(false);

@@ -24,6 +24,7 @@ import {
   TableCell,
   TableCaption,
 } from "@/components/ui/table";
+import { toast } from 'react-toastify';
 
 interface Team {
   id: number;
@@ -111,11 +112,12 @@ export default function TeamsPage() {
         setFormData({ name: "", modality: "" });
         setModalOpen(false);
         await fetchTeams();
+        toast.success('Time adicionado com sucesso!');
       } else {
-        alert("Erro ao cadastrar time");
+        toast.error('Erro ao cadastrar time');
       }
     } catch (error) {
-      alert("Erro ao conectar com o servidor");
+      toast.error('Erro ao conectar com o servidor');
       console.error("Erro ao cadastrar time:", error);
     } finally {
       setIsSaving(false);
@@ -143,7 +145,9 @@ export default function TeamsPage() {
       await fetchTeams();
       setDeleteDialogOpen(false);
       setTeamToDelete(null);
+      toast.success('Time excluído com sucesso!');
     } catch (error) {
+      toast.error('Erro ao excluir time');
       console.error("Erro ao excluir time:", error);
     } finally {
       setIsDeleting(false);
@@ -180,11 +184,12 @@ export default function TeamsPage() {
       if (response.ok) {
         setEditModalOpen(false);
         await fetchTeams();
+        toast.success('Time editado com sucesso!');
       } else {
-        alert("Erro ao editar time!");
+        toast.error('Erro ao editar time!');
       }
     } catch (error) {
-      alert("Erro ao conectar com o servidor");
+      toast.error('Erro ao conectar com o servidor');
       console.error("Erro ao editar time:", error);
     } finally {
       setIsEditing(false);

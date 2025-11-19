@@ -24,6 +24,7 @@ import {
   TableCell,
   TableCaption,
 } from "@/components/ui/table";
+import { toast } from 'react-toastify';
 
 interface Team {
   id: number;
@@ -144,11 +145,12 @@ export default function ChampionshipsPage() {
         setFormData({ name: "", year: "" });
         setModalOpen(false);
         await fetchChampionships();
+        toast.success('Campeonato adicionado com sucesso!');
       } else {
-        alert("Erro ao cadastrar campeonato");
+        toast.error('Erro ao cadastrar campeonato');
       }
     } catch (error) {
-      alert("Erro ao conectar com o servidor");
+      toast.error('Erro ao conectar com o servidor');
       console.error("Erro ao cadastrar campeonato:", error);
     } finally {
       setIsSaving(false);
@@ -178,7 +180,9 @@ export default function ChampionshipsPage() {
       await fetchChampionships();
       setDeleteDialogOpen(false);
       setChampionshipToDelete(null);
+      toast.success('Campeonato excluído com sucesso!');
     } catch (error) {
+      toast.error('Erro ao excluir campeonato');
       console.error("Erro ao excluir campeonato:", error);
     } finally {
       setIsDeleting(false);
@@ -201,7 +205,7 @@ export default function ChampionshipsPage() {
 
   const handleGenerateMatches = async () => {
     if (!selectedChampionship || selectedTeams.length < 2) {
-      alert("Selecione pelo menos 2 times");
+      toast.error("Selecione pelo menos 2 times");
       return;
     }
 
@@ -225,13 +229,13 @@ export default function ChampionshipsPage() {
       if (response.ok) {
         const result = await response.json();
         setTeamsModalOpen(false);
-        alert(`${result.data.matchesCreated} partidas geradas com sucesso!`);
+        toast.success(`${result.data.matchesCreated} partidas geradas com sucesso!`);
         window.location.href = `/dashboard/championships/${selectedChampionship.id}/matches`;
       } else {
-        alert("Erro ao gerar partidas");
+        toast.error("Erro ao gerar partidas");
       }
     } catch (error) {
-      alert("Erro ao conectar com o servidor");
+      toast.error("Erro ao conectar com o servidor");
       console.error("Erro ao gerar partidas:", error);
     } finally {
       setIsGenerating(false);
