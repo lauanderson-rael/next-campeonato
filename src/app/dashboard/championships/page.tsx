@@ -9,6 +9,7 @@ import { TeamsModal } from "@/components/championships/TeamsModal";
 import { Pagination } from "@/components/championships/Pagination";
 import { SearchInput } from "@/components/search-input";
 import { toast } from "react-toastify";
+import { useVerifyUserLogged } from "@/hooks/useVerifyUserLogged";
 
 interface Team {
   id: number;
@@ -27,6 +28,7 @@ interface Championship {
 }
 
 export default function ChampionshipsPage() {
+  useVerifyUserLogged();
   const [championships, setChampionships] = useState<Championship[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -330,7 +332,7 @@ export default function ChampionshipsPage() {
 
         <CardContent className="max-h-[60dvh] overflow-y-auto">
           {isLoading ? (
-            <p>Carregando campeonatos...</p>
+            <p className="text-center">Carregando campeonatos...</p>
           ) : (
             <>
               {paginatedChampionships.length === 0 ? (

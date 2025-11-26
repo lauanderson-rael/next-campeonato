@@ -48,6 +48,7 @@ export default function RecoverPasswordPage() {
               width={64}
               height={64}
               className="mb-2 drop-shadow-lg"
+              style={{ height: "64px", width: "64px" }}
             />
             <h1 className="text-center text-4xl font-bold text-green-700 mb-1 tracking-tight">
               IFMA Campeonatos

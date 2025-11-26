@@ -6,7 +6,6 @@ export function useApi() {
 
   const apiCall = async (endpoint: string, options: RequestInit = {}) => {
     const url = `${API_URL}${endpoint}`;
-
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       ...(options.headers as Record<string, string>),

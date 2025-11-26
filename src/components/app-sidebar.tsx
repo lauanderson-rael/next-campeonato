@@ -12,8 +12,6 @@ import {
   Settings,
   Info,
   LogOut,
-  PanelLeft,
-  PanelLeftClose,
   Trophy,
   Menu,
   X,

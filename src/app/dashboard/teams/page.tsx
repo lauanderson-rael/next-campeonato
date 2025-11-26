@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SearchInput } from "@/components/search-input";
@@ -25,7 +25,8 @@ import {
   TableCell,
   TableCaption,
 } from "@/components/ui/table";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
+import { useVerifyUserLogged } from "@/hooks/useVerifyUserLogged";
 
 interface Team {
   id: number;
@@ -35,6 +36,7 @@ interface Team {
 }
 
 export default function TeamsPage() {
+  useVerifyUserLogged();
   const [teams, setTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -57,9 +59,9 @@ export default function TeamsPage() {
 
   // Busca
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Filtrar times por nome
-  const filteredTeams = teams.filter(team =>
+  const filteredTeams = teams.filter((team) =>
     team.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -121,12 +123,12 @@ export default function TeamsPage() {
         setFormData({ name: "", modality: "" });
         setModalOpen(false);
         await fetchTeams();
-        toast.success('Time adicionado com sucesso!');
+        toast.success("Time adicionado com sucesso!");
       } else {
-        toast.error('Erro ao cadastrar time');
+        toast.error("Erro ao cadastrar time");
       }
     } catch (error) {
-      toast.error('Erro ao conectar com o servidor');
+      toast.error("Erro ao conectar com o servidor");
       console.error("Erro ao cadastrar time:", error);
     } finally {
       setIsSaving(false);
@@ -141,22 +143,25 @@ export default function TeamsPage() {
 
   const handleDeleteConfirm = async () => {
     if (!teamToDelete) return;
-    
+
     setIsDeleting(true);
     try {
       const token = localStorage.getItem("token");
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/teams/${teamToDelete.id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/teams/${teamToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       await fetchTeams();
       setDeleteDialogOpen(false);
       setTeamToDelete(null);
-      toast.success('Time excluído com sucesso!');
+      toast.success("Time excluído com sucesso!");
     } catch (error) {
-      toast.error('Erro ao excluir time');
+      toast.error("Erro ao excluir time");
       console.error("Erro ao excluir time:", error);
     } finally {
       setIsDeleting(false);
@@ -193,12 +198,12 @@ export default function TeamsPage() {
       if (response.ok) {
         setEditModalOpen(false);
         await fetchTeams();
-        toast.success('Time editado com sucesso!');
+        toast.success("Time editado com sucesso!");
       } else {
-        toast.error('Erro ao editar time!');
+        toast.error("Erro ao editar time!");
       }
     } catch (error) {
-      toast.error('Erro ao conectar com o servidor');
+      toast.error("Erro ao conectar com o servidor");
       console.error("Erro ao editar time:", error);
     } finally {
       setIsEditing(false);
@@ -322,12 +327,14 @@ export default function TeamsPage() {
         </CardHeader>
         <CardContent className="max-h-[60dvh] overflow-y-auto">
           {isLoading ? (
-            <p>Carregando times...</p>
+            <p className="text-center">Carregando times...</p>
           ) : (
             <>
               <Table>
                 <TableCaption>
-                  {searchTerm ? `${filteredTeams.length} time(s) encontrado(s)` : `Times cadastrados: ${teams.length}`}
+                  {searchTerm
+                    ? `${filteredTeams.length} time(s) encontrado(s)`
+                    : `Times cadastrados: ${teams.length}`}
                 </TableCaption>
                 <TableHeader>
                   <TableRow>
@@ -404,7 +411,7 @@ export default function TeamsPage() {
           )}
         </CardContent>
       </Card>
-      
+
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}

@@ -1,9 +1,7 @@
 "use client";
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import DashboardCard from "@/components/DashboardCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useVerifyUserLogged } from "@/hooks/useVerifyUserLogged";
 import {
   Users,
   Shield,
@@ -14,36 +12,32 @@ import {
 } from "lucide-react";
 
 export default function Dashboard() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
+  const { user, loading } = useVerifyUserLogged();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/");
-    }
-  }, [user, loading, router]);
-
+  // SKELETON
   if (loading) {
     return (
       <div>
-        <main className="flex-1 p-4 md:p-12">
+        <main className="flex-1 p-4 md:px-12">
           {/* Skeleton do título */}
           <Skeleton className="h-8 w-64 mx-auto mb-4" />
           {/* Skeleton da descrição */}
           <Skeleton className="h-5 w-96 mx-auto mb-6" />
 
           {/* Skeleton dos cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="border rounded-lg p-6 space-y-4">
-                <div className="flex items-center gap-3">
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                  <Skeleton className="h-6 w-32" />
+          <div className="md:flex md:justify-center ">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:max-w-4xl">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="border rounded-lg p-6 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <Skeleton className="h-6 w-32" />
+                  </div>
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
                 </div>
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </main>
       </div>

@@ -1,7 +1,6 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SearchInput } from "@/components/search-input";
@@ -25,8 +24,8 @@ import {
   TableCell,
   TableCaption,
 } from "@/components/ui/table";
-import { redirect } from "next/navigation";
 import { toast } from "react-toastify";
+import { useVerifyUserLogged } from "@/hooks/useVerifyUserLogged";
 
 interface Team {
   id: number;
@@ -50,6 +49,7 @@ interface Player {
 }
 
 export default function PlayersPage() {
+  useVerifyUserLogged();
   // Estados CRUD/Jogador
   const [players, setPlayers] = useState<Player[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
@@ -470,7 +470,7 @@ export default function PlayersPage() {
 
         <CardContent className="max-h-[60dvh] overflow-y-auto">
           {isLoading ? (
-            <p>Carregando jogadores...</p>
+            <p className="text-center">Carregando jogadores...</p>
           ) : (
             <>
               <Table>

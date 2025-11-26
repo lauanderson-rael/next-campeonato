@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SearchInput } from "@/components/search-input";
@@ -25,7 +25,8 @@ import {
   TableCell,
   TableCaption,
 } from "@/components/ui/table";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
+import { useVerifyUserLogged } from "@/hooks/useVerifyUserLogged";
 
 interface Class {
   id: number;
@@ -38,6 +39,7 @@ interface Class {
 }
 
 export default function ClassesPage() {
+  useVerifyUserLogged();
   // Listagem e CRUD
   const [classes, setClasses] = useState<Class[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,15 +72,15 @@ export default function ClassesPage() {
 
   // Busca
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Filtrar turmas por nome
-  const filteredClasses = classes.filter(cls =>
+  const filteredClasses = classes.filter((cls) =>
     cls.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 8;
   const totalPages = Math.ceil(filteredClasses.length / itemsPerPage);
   const paginatedClasses = filteredClasses.slice(
     (currentPage - 1) * itemsPerPage,
@@ -152,12 +154,12 @@ export default function ClassesPage() {
         });
         setModalOpen(false);
         await fetchClasses();
-        toast.success('Turma adicionada com sucesso!');
+        toast.success("Turma adicionada com sucesso!");
       } else {
-        toast.error('Erro ao cadastrar turma');
+        toast.error("Erro ao cadastrar turma");
       }
     } catch (error) {
-      toast.error('Erro ao conectar com o servidor');
+      toast.error("Erro ao conectar com o servidor");
       console.error("Erro ao cadastrar classe:", error);
     } finally {
       setIsSaving(false);
@@ -172,22 +174,25 @@ export default function ClassesPage() {
 
   const handleDeleteConfirm = async () => {
     if (!classToDelete) return;
-    
+
     setIsDeleting(true);
     try {
       const token = localStorage.getItem("token");
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/classes/${classToDelete.id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/classes/${classToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       await fetchClasses();
       setDeleteDialogOpen(false);
       setClassToDelete(null);
-      toast.success('Turma excluída com sucesso!');
+      toast.success("Turma excluída com sucesso!");
     } catch (error) {
-      toast.error('Erro ao excluir turma');
+      toast.error("Erro ao excluir turma");
       console.error("Erro ao excluir turma:", error);
     } finally {
       setIsDeleting(false);
@@ -237,12 +242,12 @@ export default function ClassesPage() {
       if (response.ok) {
         setEditModalOpen(false);
         await fetchClasses();
-        toast.success('Turma editada com sucesso!');
+        toast.success("Turma editada com sucesso!");
       } else {
-        toast.error('Erro ao editar turma!');
+        toast.error("Erro ao editar turma!");
       }
     } catch (error) {
-      toast.error('Erro ao conectar com o servidor');
+      toast.error("Erro ao conectar com o servidor");
       console.error("Erro ao editar turma:", error);
     } finally {
       setIsEditing(false);
@@ -424,12 +429,14 @@ export default function ClassesPage() {
 
         <CardContent className="max-h-[60dvh] overflow-y-auto">
           {isLoading ? (
-            <p>Carregando classes...</p>
+            <p className="text-center">Carregando classes...</p>
           ) : (
             <>
               <Table>
                 <TableCaption>
-                  {searchTerm ? `${filteredClasses.length} turma(s) encontrada(s)` : `Classes cadastradas: ${classes.length}`}
+                  {searchTerm
+                    ? `${filteredClasses.length} turma(s) encontrada(s)`
+                    : `Classes cadastradas: ${classes.length}`}
                 </TableCaption>
                 <TableHeader>
                   <TableRow>
@@ -512,7 +519,7 @@ export default function ClassesPage() {
           )}
         </CardContent>
       </Card>
-      
+
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}

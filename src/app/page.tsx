@@ -1,8 +1,29 @@
+"use client";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import LoginForm from "../components/loginForm";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/dashboard");
+    }
+  }, [user, loading, router]);
+
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-screen text-2xl">
+  //       Carregando...
+  //     </div>
+  //   );
+  // }
+
   return (
     <div className="flex flex-col px-4 justify-center items-center min-h-screen  animate-in fade-in duration-700">
       <Card className="w-full max-w-md p-8 shadow-xl border border-border bg-card/80 backdrop-blur-md flex flex-col items-center gap-2">
@@ -12,7 +33,8 @@ export default function Home() {
             alt="Logo IFMA"
             width={64}
             height={64}
-            className="mb-2 drop-shadow-lg "
+            className="mb-2 drop-shadow-lg"
+            style={{ height: "64px", width: "64px" }}
           />
           <h1 className="text-center   text-4xl font-bold text-green-700 mb-1 tracking-tight">
             IFMA Campeonatos

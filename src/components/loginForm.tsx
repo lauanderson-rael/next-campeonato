@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
@@ -29,12 +28,12 @@ export default function LoginForm() {
 
   // Carregar Google Identity Services
   useEffect(() => {
-    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-    if (!clientId) {
-      console.warn("GOOGLE_CLIENT_ID não está definido.");
-      return;
-    }
+    // if (!clientId) {
+    //   console.warn("GOOGLE_CLIENT_ID não está definido.");
+    //   return;
+    // }
 
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
@@ -119,21 +118,21 @@ export default function LoginForm() {
     }
   }
 
-  function loginGoogle() {
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    console.log(clientId);
-    console.log(!clientId);
-    if (!clientId) {
-      toast.error("Google OAuth não configurado.");
-      return;
-    }
+  // function loginGoogle() {
+  //   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  //   console.log(clientId);
+  //   console.log(!clientId);
+  //   if (!clientId) {
+  //     toast.error("Google OAuth não configurado.");
+  //     return;
+  //   }
 
-    if (window.google && window.google.accounts) {
-      window.google.accounts.id.prompt();
-    } else {
-      toast.error("Google OAuth não carregado. Tente novamente.");
-    }
-  }
+  //   if (window.google && window.google.accounts) {
+  //     window.google.accounts.id.prompt();
+  //   } else {
+  //     toast.error("Google OAuth não carregado. Tente novamente.");
+  //   }
+  // }
 
   return (
     <div className="w-full flex flex-col gap-6 animate-in fade-in">
