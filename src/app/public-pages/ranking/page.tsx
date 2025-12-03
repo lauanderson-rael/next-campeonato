@@ -36,125 +36,6 @@ interface Championship {
   modality: string;
 }
 
-// Dados mockados para fallback
-const MOCK_CHAMPIONSHIPS: Championship[] = [
-  { id: 1, name: "Campeonato de Futebol", year: 2024, modality: "Futebol" },
-  { id: 2, name: "Campeonato de Vôlei", year: 2024, modality: "Vôlei" },
-  { id: 3, name: "Campeonato de Basquete", year: 2024, modality: "Basquete" },
-];
-
-const MOCK_RANKING: Record<number, RankingTeam[]> = {
-  1: [
-    {
-      position: 1,
-      teamId: 1,
-      teamName: "Informática A",
-      points: 9,
-      wins: 3,
-      draws: 0,
-      losses: 0,
-      goalsFor: 8,
-      goalsAgainst: 2,
-      goalDifference: 6,
-      matchesPlayed: 3,
-    },
-    {
-      position: 2,
-      teamId: 2,
-      teamName: "Mecânica B",
-      points: 6,
-      wins: 2,
-      draws: 0,
-      losses: 1,
-      goalsFor: 6,
-      goalsAgainst: 4,
-      goalDifference: 2,
-      matchesPlayed: 3,
-    },
-    {
-      position: 3,
-      teamId: 3,
-      teamName: "Eletrônica A",
-      points: 4,
-      wins: 1,
-      draws: 1,
-      losses: 1,
-      goalsFor: 5,
-      goalsAgainst: 5,
-      goalDifference: 0,
-      matchesPlayed: 3,
-    },
-    {
-      position: 4,
-      teamId: 4,
-      teamName: "Edificações B",
-      points: 1,
-      wins: 0,
-      draws: 1,
-      losses: 2,
-      goalsFor: 3,
-      goalsAgainst: 7,
-      goalDifference: -4,
-      matchesPlayed: 3,
-    },
-  ],
-  2: [
-    {
-      position: 1,
-      teamId: 5,
-      teamName: "Química A",
-      points: 9,
-      wins: 3,
-      draws: 0,
-      losses: 0,
-      goalsFor: 9,
-      goalsAgainst: 1,
-      goalDifference: 8,
-      matchesPlayed: 3,
-    },
-    {
-      position: 2,
-      teamId: 6,
-      teamName: "Administração B",
-      points: 6,
-      wins: 2,
-      draws: 0,
-      losses: 1,
-      goalsFor: 6,
-      goalsAgainst: 3,
-      goalDifference: 3,
-      matchesPlayed: 3,
-    },
-  ],
-  3: [
-    {
-      position: 1,
-      teamId: 7,
-      teamName: "Mecânica A",
-      points: 6,
-      wins: 2,
-      draws: 0,
-      losses: 0,
-      goalsFor: 150,
-      goalsAgainst: 120,
-      goalDifference: 30,
-      matchesPlayed: 2,
-    },
-    {
-      position: 2,
-      teamId: 8,
-      teamName: "Eletrônica B",
-      points: 0,
-      wins: 0,
-      draws: 0,
-      losses: 2,
-      goalsFor: 120,
-      goalsAgainst: 150,
-      goalDifference: -30,
-      matchesPlayed: 2,
-    },
-  ],
-};
 
 export default function PublicRankingPage() {
   const [championships, setChampionships] = useState<Championship[]>([]);
@@ -180,7 +61,7 @@ export default function PublicRankingPage() {
   const fetchChampionships = async () => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/championships`
+        `${process.env.NEXT_PUBLIC_API_URL}/public/championships`
       );
       const data = await res.json();
       const champsArray = Array.isArray(data) ? data : [];
@@ -189,12 +70,8 @@ export default function PublicRankingPage() {
         setSelectedChampionshipId(String(champsArray[0].id));
       }
     } catch (error) {
-      console.error(
-        "Erro ao buscar campeonatos, usando dados mockados:",
-        error
-      );
-      setChampionships(MOCK_CHAMPIONSHIPS);
-      setSelectedChampionshipId(String(MOCK_CHAMPIONSHIPS[0].id));
+      console.error("Erro ao buscar campeonatos:", error);
+      setChampionships([]);
     }
   };
 
@@ -202,14 +79,14 @@ export default function PublicRankingPage() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/championships/${id}/ranking`
+        `${process.env.NEXT_PUBLIC_API_URL}/public/championships/${id}/ranking`
       );
       const data = await res.json();
-      setRanking(data);
+      const rankingArray = Array.isArray(data) ? data : [];
+      setRanking(rankingArray);
     } catch (error) {
-      console.error("Erro ao buscar ranking, usando dados mockados:", error);
-      const mockData = MOCK_RANKING[Number(id)] || [];
-      setRanking(mockData);
+      console.error("Erro ao buscar ranking:", error);
+      setRanking([]);
     } finally {
       setIsLoading(false);
     }
@@ -222,7 +99,7 @@ export default function PublicRankingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       {/* Header */}
-      <header className="bg-green-700 text-white py-4 shadow-lg sticky top-0">
+      <header className="bg-green-700 text-white py-4 shadow-lg sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

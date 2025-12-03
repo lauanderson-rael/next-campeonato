@@ -35,98 +35,30 @@ interface Championship {
   modality: string;
 }
 
-// Dados mockados - substituir quando o endpoint estiver disponível
-const MOCK_MATCHES: Match[] = [
-  {
-    id: 1,
-    championshipId: 1,
-    championship: "Campeonato de Futebol 2024",
-    team1: "Informática A",
-    team2: "Mecânica B",
-    score1: 3,
-    score2: 1,
-    status: 2,
-    date: "2024-01-15T14:00:00",
-    modality: "Futebol",
-  },
-  {
-    id: 2,
-    championshipId: 1,
-    championship: "Campeonato de Futebol 2024",
-    team1: "Eletrônica A",
-    team2: "Edificações B",
-    score1: 2,
-    score2: 2,
-    status: 2,
-    date: "2024-01-15T16:00:00",
-    modality: "Futebol",
-  },
-  {
-    id: 3,
-    championshipId: 2,
-    championship: "Campeonato de Vôlei 2024",
-    team1: "Química A",
-    team2: "Administração B",
-    score1: 3,
-    score2: 0,
-    status: 2,
-    date: "2024-01-16T10:00:00",
-    modality: "Vôlei",
-  },
-  {
-    id: 4,
-    championshipId: 1,
-    championship: "Campeonato de Futebol 2024",
-    team1: "Informática B",
-    team2: "Química A",
-    score1: 0,
-    score2: 0,
-    status: 1,
-    date: "2024-01-20T14:00:00",
-    modality: "Futebol",
-  },
-  {
-    id: 5,
-    championshipId: 3,
-    championship: "Campeonato de Basquete 2024",
-    team1: "Mecânica A",
-    team2: "Eletrônica B",
-    score1: 0,
-    score2: 0,
-    status: 0,
-    date: "2024-01-22T15:00:00",
-    modality: "Basquete",
-  },
-  {
-    id: 6,
-    championshipId: 2,
-    championship: "Campeonato de Vôlei 2024",
-    team1: "Edificações A",
-    team2: "Informática A",
-    score1: 0,
-    score2: 0,
-    status: 0,
-    date: "2024-01-23T11:00:00",
-    modality: "Vôlei",
-  },
-];
 
 export default function PublicMatchesPage() {
   const [championships, setChampionships] = useState<Championship[]>([]);
   const [selectedChampionshipId, setSelectedChampionshipId] =
     useState<string>("all");
-  const [matches] = useState<Match[]>(MOCK_MATCHES);
+  const [matches, setMatches] = useState<Match[]>([]);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterModality, setFilterModality] = useState<string>("all");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchChampionships();
+    fetchMatches();
   }, []);
+
+  useEffect(() => {
+    // Recarregar partidas quando o campeonato selecionado mudar
+    fetchMatches();
+  }, [selectedChampionshipId]);
 
   const fetchChampionships = async () => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/championships`
+        `${process.env.NEXT_PUBLIC_API_URL}/public/championships`
       );
       const data = await res.json();
       const champsArray = Array.isArray(data) ? data : [];
@@ -134,6 +66,25 @@ export default function PublicMatchesPage() {
     } catch (error) {
       console.error("Erro ao buscar campeonatos:", error);
       setChampionships([]);
+    }
+  };
+
+  const fetchMatches = async () => {
+    setIsLoading(true);
+    try {
+      const url = selectedChampionshipId === "all"
+        ? `${process.env.NEXT_PUBLIC_API_URL}/public/matches`
+        : `${process.env.NEXT_PUBLIC_API_URL}/public/matches?championshipId=${selectedChampionshipId}`;
+      
+      const res = await fetch(url);
+      const data = await res.json();
+      const matchesArray = Array.isArray(data) ? data : [];
+      setMatches(matchesArray);
+    } catch (error) {
+      console.error("Erro ao buscar partidas:", error);
+      setMatches([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -190,7 +141,7 @@ export default function PublicMatchesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       {/* Header */}
-      <header className="bg-green-700 text-white py-4 shadow-lg sticky top-0">
+      <header className="bg-green-700 text-white py-4 shadow-lg sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -293,11 +244,16 @@ export default function PublicMatchesPage() {
               </div>
 
               {/* Tabela de Partidas */}
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableCaption>
-                    {filteredMatches.length} partida(s) encontrada(s)
-                  </TableCaption>
+              {isLoading ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">Carregando partidas...</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableCaption>
+                      {filteredMatches.length} partida(s) encontrada(s)
+                    </TableCaption>
                   <TableHeader>
                     <TableRow className="bg-gray-100">
                       <TableHead className="font-bold">Campeonato</TableHead>
@@ -374,6 +330,7 @@ export default function PublicMatchesPage() {
                   </TableBody>
                 </Table>
               </div>
+              )}
             </CardContent>
           </Card>
 
