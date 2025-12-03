@@ -70,7 +70,12 @@ export function AppSidebar() {
   const { open, toggleSidebar } = useSidebar();
 
   return (
-    <Sidebar side="left" collapsible="icon" variant="sidebar" className="ml-2">
+    <Sidebar
+      side="left"
+      collapsible="icon"
+      variant="sidebar"
+      className="ml-2 z-20"
+    >
       {/* <SidebarTrigger className="ml-2 mt-1 text-gray-800 hidden md:flex hover:text-gray-950"   /> */}
       <Button
         variant="ghost"
