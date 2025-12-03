@@ -17,7 +17,7 @@ export default function Header() {
   };
 
   return (
-    <div className="flex justify-between items-center px-4 py-4 bg-green-700 shadow-lg sticky top-0 z-50">
+    <div className="flex justify-between items-center px-4 py-4 bg-green-700 shadow-lg sticky top-0">
       <div className="flex items-center gap-3">
         {/* Botão para abrir Sidebar só aparece no mobile */}
         <button
