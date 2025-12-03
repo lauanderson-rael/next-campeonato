@@ -108,28 +108,25 @@ export default function ReportsPage() {
       setTeams(Array.isArray(teamsData) ? teamsData : []);
       setPlayers(Array.isArray(playersData) ? playersData : []);
 
-      // Buscar partidas e ranking do primeiro campeonato
-      if (champsData.length > 0) {
-        const firstChampId = champsData[0].id;
-        const [matchesRes, rankingRes] = await Promise.all([
-          fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/matches?championshipId=${firstChampId}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/championships/${firstChampId}/ranking`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-        ]);
-        const matchesData = await matchesRes.json();
-        const rankingData = await rankingRes.json();
-        setMatches(Array.isArray(matchesData) ? matchesData : []);
-        setRanking(Array.isArray(rankingData) ? rankingData.slice(0, 5) : []);
-      }
+      // Buscar TODAS as partidas para os relatórios gerais
+      // Buscar ranking do primeiro campeonato apenas para o gráfico Top 5
+      const [matchesRes, rankingRes] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/matches`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        champsData.length > 0
+          ? fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/championships/${champsData[0].id}/ranking`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            )
+          : Promise.resolve({ json: async () => [] }),
+      ]);
+      const matchesData = await matchesRes.json();
+      const rankingData = await rankingRes.json();
+      setMatches(Array.isArray(matchesData) ? matchesData : []);
+      setRanking(Array.isArray(rankingData) ? rankingData.slice(0, 5) : []);
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
     } finally {
