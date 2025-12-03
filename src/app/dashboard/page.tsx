@@ -195,7 +195,7 @@ export default function Dashboard() {
                         {stats.players}
                       </p>
                     </div>
-                    <Target className="text-purple-600" size={32} />
+                    <Users className="w-6 h-6  text-purple-700" size={32} />
                   </CardContent>
                 </Card>
 
