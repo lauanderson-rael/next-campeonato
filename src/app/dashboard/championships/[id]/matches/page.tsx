@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ import {
   TableCell,
   TableCaption,
 } from "@/components/ui/table";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 interface Team {
   id: number;
@@ -101,7 +101,7 @@ export default function ChampionshipMatchesPage() {
       month: "2-digit",
       year: "numeric",
       hour: "2-digit",
-      minute: "2-digit"
+      minute: "2-digit",
     });
   }
 
@@ -131,7 +131,7 @@ export default function ChampionshipMatchesPage() {
     }
   }
 
-  const fetchMatches = async () => {
+  const fetchMatches = useCallback(async () => {
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(
@@ -152,18 +152,20 @@ export default function ChampionshipMatchesPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [championshipId]);
 
   useEffect(() => {
     fetchMatches();
-  }, [championshipId]);
+  }, [fetchMatches]);
 
   const handleResultClick = (match: Match) => {
     setSelectedMatch(match);
     setResultData({
       team1Goals: String(match.matchTeams[0]?.goalsTeam || 0),
       team2Goals: String(match.matchTeams[1]?.goalsTeam || 0),
-      playDay: match.playDay ? new Date(match.playDay).toISOString().slice(0, 16) : "",
+      playDay: match.playDay
+        ? new Date(match.playDay).toISOString().slice(0, 16)
+        : "",
     });
     setResultModalOpen(true);
   };
@@ -201,7 +203,9 @@ export default function ChampionshipMatchesPage() {
                 goals: Number(resultData.team2Goals),
               },
             ],
-            playDay: resultData.playDay ? new Date(resultData.playDay).toISOString() : null,
+            playDay: resultData.playDay
+              ? new Date(resultData.playDay).toISOString()
+              : null,
           }),
         }
       );
@@ -359,13 +363,17 @@ export default function ChampionshipMatchesPage() {
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 flex-1">
                     <Shield className="text-blue-600" size={16} />
-                    <span className="font-medium">{selectedMatch.matchTeams[0]?.team.name}</span>
+                    <span className="font-medium">
+                      {selectedMatch.matchTeams[0]?.team.name}
+                    </span>
                   </div>
                   <Input
                     type="number"
                     min="0"
                     value={resultData.team1Goals}
-                    onChange={(e) => handleResultFormChange("team1Goals", e.target.value)}
+                    onChange={(e) =>
+                      handleResultFormChange("team1Goals", e.target.value)
+                    }
                     className="w-20 text-center"
                     required
                   />
@@ -373,13 +381,17 @@ export default function ChampionshipMatchesPage() {
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 flex-1">
                     <Zap className="text-red-600" size={16} />
-                    <span className="font-medium">{selectedMatch.matchTeams[1]?.team.name}</span>
+                    <span className="font-medium">
+                      {selectedMatch.matchTeams[1]?.team.name}
+                    </span>
                   </div>
                   <Input
                     type="number"
                     min="0"
                     value={resultData.team2Goals}
-                    onChange={(e) => handleResultFormChange("team2Goals", e.target.value)}
+                    onChange={(e) =>
+                      handleResultFormChange("team2Goals", e.target.value)
+                    }
                     className="w-20 text-center"
                     required
                   />
@@ -391,7 +403,9 @@ export default function ChampionshipMatchesPage() {
                   id="playDay"
                   type="datetime-local"
                   value={resultData.playDay}
-                  onChange={(e) => handleResultFormChange("playDay", e.target.value)}
+                  onChange={(e) =>
+                    handleResultFormChange("playDay", e.target.value)
+                  }
                 />
               </div>
               <DialogFooter>

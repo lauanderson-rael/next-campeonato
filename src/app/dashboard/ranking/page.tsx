@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -45,20 +45,7 @@ export default function RankingPage() {
   const [ranking, setRanking] = useState<RankingTeam[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchChampionships();
-  }, []);
-
-  useEffect(() => {
-    if (selectedChampionshipId) {
-      fetchRanking(selectedChampionshipId);
-    } else {
-      setRanking([]);
-      setIsLoading(false);
-    }
-  }, [selectedChampionshipId]);
-
-  const fetchChampionships = async () => {
+  const fetchChampionships = useCallback(async () => {
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(
@@ -77,7 +64,20 @@ export default function RankingPage() {
     } catch (error) {
       console.error("Erro ao buscar campeonatos:", error);
     }
-  };
+  }, [selectedChampionshipId]);
+
+  useEffect(() => {
+    fetchChampionships();
+  }, [fetchChampionships]);
+
+  useEffect(() => {
+    if (selectedChampionshipId) {
+      fetchRanking(selectedChampionshipId);
+    } else {
+      setRanking([]);
+      setIsLoading(false);
+    }
+  }, [selectedChampionshipId]);
 
   const fetchRanking = async (id: string) => {
     setIsLoading(true);
