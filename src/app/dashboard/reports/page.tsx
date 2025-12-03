@@ -17,7 +17,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Trophy, Users, Calendar, Target } from "lucide-react";
+import { Trophy, Users, Calendar, Target, Download, FileSpreadsheet } from "lucide-react";
 
 interface Championship {
   id: number;
@@ -119,6 +119,40 @@ export default function ReportsPage() {
     } catch (error) {
       console.error("Erro ao buscar ranking:", error);
       setRanking([]);
+    }
+  };
+
+  // Função para download de relatórios
+  const downloadReport = async (
+    endpoint: string,
+    filename: string,
+    format: "csv" | "xlsx"
+  ) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/reports/${endpoint}?format=${format}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao baixar relatório");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${filename}_${Date.now()}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Erro ao baixar relatório:", error);
+      alert("Erro ao baixar relatório. Tente novamente.");
     }
   };
 
@@ -237,9 +271,31 @@ export default function ReportsPage() {
 
   return (
     <div className="flex flex-col items-center p-4 md:px-6">
-      <h1 className="w-full text-2xl font-bold mb-4 text-center">
-        Relatórios e Estatísticas
-      </h1>
+      <div className="w-full max-w-6xl flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Relatórios e Estatísticas</h1>
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              downloadReport("players-by-modality", "jogadores_por_modalidade", "csv")
+            }
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
+            title="Baixar CSV"
+          >
+            <Download size={16} />
+            CSV - Jogadores por Modalidade
+          </button>
+          <button
+            onClick={() =>
+              downloadReport("players-by-modality", "jogadores_por_modalidade", "xlsx")
+            }
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+            title="Baixar XLSX"
+          >
+            <FileSpreadsheet size={16} />
+            XLSX - Jogadores por Modalidade
+          </button>
+        </div>
+      </div>
 
       <div className="w-full max-w-6xl space-y-6">
         {/* Cards de Resumo */}
@@ -418,7 +474,69 @@ export default function ReportsPage() {
         {/* Gráfico Top 5 Times */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg mb-4">Top 5 Times - Ranking</CardTitle>
+            <div className="flex justify-between items-start mb-4">
+              <CardTitle className="text-lg">Top 5 Times - Ranking</CardTitle>
+              {selectedChampionshipId && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() =>
+                      downloadReport(
+                        `top-teams/${selectedChampionshipId}`,
+                        "melhores_times",
+                        "csv"
+                      )
+                    }
+                    className="flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-xs"
+                    title="Baixar CSV"
+                  >
+                    <Download size={14} />
+                    CSV
+                  </button>
+                  <button
+                    onClick={() =>
+                      downloadReport(
+                        `top-teams/${selectedChampionshipId}`,
+                        "melhores_times",
+                        "xlsx"
+                      )
+                    }
+                    className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-xs"
+                    title="Baixar XLSX"
+                  >
+                    <FileSpreadsheet size={14} />
+                    XLSX
+                  </button>
+                  <button
+                    onClick={() =>
+                      downloadReport(
+                        `matches/${selectedChampionshipId}`,
+                        "resultados_partidas",
+                        "csv"
+                      )
+                    }
+                    className="flex items-center gap-1 px-3 py-1.5 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors text-xs"
+                    title="Baixar Resultados CSV"
+                  >
+                    <Download size={14} />
+                    Partidas CSV
+                  </button>
+                  <button
+                    onClick={() =>
+                      downloadReport(
+                        `champions/${selectedChampionshipId}`,
+                        "campeoes",
+                        "xlsx"
+                      )
+                    }
+                    className="flex items-center gap-1 px-3 py-1.5 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors text-xs"
+                    title="Baixar Campeões XLSX"
+                  >
+                    <Trophy size={14} />
+                    Campeões
+                  </button>
+                </div>
+              )}
+            </div>
             {championships.length > 0 && (
               <div className="mb-4">
                 <label htmlFor="championship-select" className="block text-sm font-medium mb-2">
@@ -437,12 +555,6 @@ export default function ReportsPage() {
                     </option>
                   ))}
                 </select>
-                {/* {selectedChampionshipId && (
-                  <p className="text-sm text-gray-600 mt-2">
-                    {championships.find((c) => String(c.id) === selectedChampionshipId)?.name || ""} (
-                    {championships.find((c) => String(c.id) === selectedChampionshipId)?.year || ""})
-                  </p>
-                )} */}
               </div>
             )}
           </CardHeader>
