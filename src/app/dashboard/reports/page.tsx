@@ -39,6 +39,12 @@ interface RankingTeam {
 interface Match {
   id: number;
   status: number;
+  championshipId?: number;
+  championship?: {
+    id: number;
+    name: string;
+    year: number;
+  };
 }
 
 interface Team {
@@ -79,11 +85,42 @@ export default function ReportsPage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [ranking, setRanking] = useState<RankingTeam[]>([]);
+  const [selectedChampionshipId, setSelectedChampionshipId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchAllData();
   }, []);
+
+  // Buscar ranking quando o campeonato selecionado mudar
+  useEffect(() => {
+    if (selectedChampionshipId) {
+      fetchRanking(selectedChampionshipId);
+    } else {
+      setRanking([]);
+    }
+  }, [selectedChampionshipId]);
+
+  const fetchRanking = async (championshipId: string) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/championships/${championshipId}/ranking`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const rankingData = await response.json();
+      // Pegar top 5 e ordenar por pontos
+      const topRanking = Array.isArray(rankingData)
+        ? rankingData.sort((a: RankingTeam, b: RankingTeam) => b.points - a.points).slice(0, 5)
+        : [];
+      setRanking(topRanking);
+    } catch (error) {
+      console.error("Erro ao buscar ranking:", error);
+      setRanking([]);
+    }
+  };
 
   const fetchAllData = async () => {
     const token = localStorage.getItem("token");
@@ -104,32 +141,22 @@ export default function ReportsPage() {
       const teamsData = await teamsRes.json();
       const playersData = await playersRes.json();
 
-      setChampionships(Array.isArray(champsData) ? champsData : []);
+      const champsArray = Array.isArray(champsData) ? champsData : [];
+      setChampionships(champsArray);
       setTeams(Array.isArray(teamsData) ? teamsData : []);
       setPlayers(Array.isArray(playersData) ? playersData : []);
 
-      // Buscar partidas e ranking do primeiro campeonato
-      if (champsData.length > 0) {
-        const firstChampId = champsData[0].id;
-        const [matchesRes, rankingRes] = await Promise.all([
-          fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/matches?championshipId=${firstChampId}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/championships/${firstChampId}/ranking`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-        ]);
-        const matchesData = await matchesRes.json();
-        const rankingData = await rankingRes.json();
-        setMatches(Array.isArray(matchesData) ? matchesData : []);
-        setRanking(Array.isArray(rankingData) ? rankingData.slice(0, 5) : []);
+      // Definir primeiro campeonato como selecionado por padrão
+      if (champsArray.length > 0 && !selectedChampionshipId) {
+        setSelectedChampionshipId(String(champsArray[0].id));
       }
+
+      // Buscar TODAS as partidas para os relatórios gerais
+      const matchesRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/matches`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const matchesData = await matchesRes.json();
+      setMatches(Array.isArray(matchesData) ? matchesData : []);
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
     } finally {
@@ -148,13 +175,29 @@ export default function ReportsPage() {
     return acc;
   }, []);
 
-  const yearData = championships
+  // Dados de Campeonatos por Ano
+  const championshipsByYear = championships
     .reduce((acc: YearData[], champ) => {
       const existing = acc.find((item) => item.year === champ.year);
       if (existing) {
         existing.total += 1;
       } else {
         acc.push({ year: champ.year, total: 1 });
+      }
+      return acc;
+    }, [])
+    .sort((a, b) => a.year - b.year);
+
+  // Dados de Partidas por Ano (baseado no ano do campeonato de cada partida)
+  const matchesByYear = matches
+    .filter((match) => match.championship?.year)
+    .reduce((acc: YearData[], match) => {
+      const year = match.championship!.year;
+      const existing = acc.find((item) => item.year === year);
+      if (existing) {
+        existing.total += 1;
+      } else {
+        acc.push({ year, total: 1 });
       }
       return acc;
     }, [])
@@ -318,15 +361,15 @@ export default function ReportsPage() {
           </Card>
         )}
 
-        {/* Gráfico de Campeonatos por Ano */}
-        {yearData.length > 0 && (
+        {/* Gráfico de Partidas por Ano */}
+        {matchesByYear.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Campeonatos por Ano</CardTitle>
+              <CardTitle className="text-lg">Partidas por Ano</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={yearData}>
+                <LineChart data={matchesByYear}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="year" />
                   <YAxis />
@@ -337,7 +380,34 @@ export default function ReportsPage() {
                     dataKey="total"
                     stroke="#16a34a"
                     strokeWidth={2}
-                    name="Total"
+                    name="Total de Partidas"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Gráfico de Campeonatos por Ano */}
+        {championshipsByYear.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Campeonatos por Ano</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={championshipsByYear}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="year" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="total"
+                    stroke="#2563eb"
+                    strokeWidth={2}
+                    name="Total de Campeonatos"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -346,11 +416,37 @@ export default function ReportsPage() {
         )}
 
         {/* Gráfico Top 5 Times */}
-        {topTeamsData.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Top 5 Times - Ranking</CardTitle>
-            </CardHeader>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg mb-4">Top 5 Times - Ranking</CardTitle>
+            {championships.length > 0 && (
+              <div className="mb-4">
+                <label htmlFor="championship-select" className="block text-sm font-medium mb-2">
+                  Selecione o Campeonato:
+                </label>
+                <select
+                  id="championship-select"
+                  value={selectedChampionshipId || ""}
+                  onChange={(e) => setSelectedChampionshipId(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="">Selecione um campeonato</option>
+                  {championships.map((champ) => (
+                    <option key={champ.id} value={champ.id}>
+                      {champ.name} ({champ.year}) - {champ.modality}
+                    </option>
+                  ))}
+                </select>
+                {/* {selectedChampionshipId && (
+                  <p className="text-sm text-gray-600 mt-2">
+                    {championships.find((c) => String(c.id) === selectedChampionshipId)?.name || ""} (
+                    {championships.find((c) => String(c.id) === selectedChampionshipId)?.year || ""})
+                  </p>
+                )} */}
+              </div>
+            )}
+          </CardHeader>
+          {topTeamsData.length > 0 && (
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={topTeamsData}>
@@ -364,8 +460,22 @@ export default function ReportsPage() {
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
-          </Card>
-        )}
+          )}
+          {topTeamsData.length === 0 && selectedChampionshipId && (
+            <CardContent>
+              <p className="text-center text-gray-500 py-8">
+                Nenhum dado de ranking disponível para este campeonato.
+              </p>
+            </CardContent>
+          )}
+          {!selectedChampionshipId && (
+            <CardContent>
+              <p className="text-center text-gray-500 py-8">
+                Selecione um campeonato para ver o ranking.
+              </p>
+            </CardContent>
+          )}
+        </Card>
         </div>
       </div>
     </div>
