@@ -6,6 +6,7 @@ import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialo
 import { ChampionshipCard } from "@/components/championships/ChampionshipCard";
 import { ChampionshipForm } from "@/components/championships/ChampionshipForm";
 import { TeamsModal } from "@/components/championships/TeamsModal";
+import { KnockoutPairsModal } from "@/components/championships/KnockoutPairsModal";
 import { Pagination } from "@/components/championships/Pagination";
 import { SearchInput } from "@/components/search-input";
 import { toast } from "react-toastify";
@@ -22,6 +23,7 @@ interface Championship {
   name: string;
   year: number;
   modality: string;
+  format?: string;
   teams?: Team[];
   createdAt?: string;
   updatedAt?: string;
@@ -37,6 +39,7 @@ export default function ChampionshipsPage() {
     name: "",
     year: "",
     modality: "",
+    format: "Pontos Corridos",
   });
   const [isSaving, setIsSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,6 +52,7 @@ export default function ChampionshipsPage() {
     name: "",
     year: "",
     modality: "",
+    format: "Pontos Corridos",
   });
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -58,6 +62,12 @@ export default function ChampionshipsPage() {
     useState<Championship | null>(null);
   const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Modal mata-mata
+  const [knockoutModalOpen, setKnockoutModalOpen] = useState(false);
+  const [knockoutChampionship, setKnockoutChampionship] =
+    useState<Championship | null>(null);
+  const [isCreatingKnockout, setIsCreatingKnockout] = useState(false);
 
   // Exclusão
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -73,7 +83,10 @@ export default function ChampionshipsPage() {
     (championship) =>
       championship.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       championship.modality.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      championship.year.toString().includes(searchTerm)
+      championship.year.toString().includes(searchTerm) ||
+      (championship.format ?? "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
   );
   const totalPages = Math.ceil(filteredChampionships.length / itemsPerPage);
   const paginatedChampionships = filteredChampionships.slice(
@@ -156,11 +169,17 @@ export default function ChampionshipsPage() {
             name: formData.name,
             year: Number(formData.year),
             modality: formData.modality,
+            format: formData.format,
           }),
         }
       );
       if (response.ok) {
-        setFormData({ name: "", year: "", modality: "" });
+        setFormData({
+          name: "",
+          year: "",
+          modality: "",
+          format: "Pontos Corridos",
+        });
         setModalOpen(false);
         await fetchChampionships();
         toast.success("Campeonato adicionado com sucesso!");
@@ -213,6 +232,40 @@ export default function ChampionshipsPage() {
     setTeamsModalOpen(true);
   };
 
+  const handleKnockoutClick = async (championship: Championship) => {
+    setKnockoutChampionship(championship);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/matches?championshipId=${championship.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        toast.error("Erro ao verificar confrontos");
+        return;
+      }
+
+      const data = await response.json();
+      const matches = Array.isArray(data) ? data : [];
+      const hasKnockoutMatches = matches.some((match) => match.isKnockout);
+
+      if (hasKnockoutMatches) {
+        window.location.href = `/dashboard/championships/${championship.id}/matches`;
+        return;
+      }
+
+      setKnockoutModalOpen(true);
+    } catch (error) {
+      toast.error("Erro ao conectar com o servidor");
+      console.error("Erro ao verificar confrontos:", error);
+    }
+  };
+
   const handleTeamToggle = (teamId: number) => {
     setSelectedTeams((prev) =>
       prev.includes(teamId)
@@ -227,6 +280,7 @@ export default function ChampionshipsPage() {
       name: championship.name,
       year: String(championship.year),
       modality: championship.modality,
+      format: championship.format ?? "Pontos Corridos",
     });
     setEditModalOpen(true);
   };
@@ -250,6 +304,7 @@ export default function ChampionshipsPage() {
             name: editFormData.name,
             year: Number(editFormData.year),
             modality: editFormData.modality,
+            format: editFormData.format,
           }),
         }
       );
@@ -310,6 +365,44 @@ export default function ChampionshipsPage() {
     }
   };
 
+  const handleCreateKnockout = async (data: {
+    round: number;
+    pairs: { homeTeamId: number; awayTeamId: number }[];
+  }) => {
+    if (!knockoutChampionship) return;
+    setIsCreatingKnockout(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/championships/${knockoutChampionship.id}/knockout-matches`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        setKnockoutModalOpen(false);
+        toast.success(
+          `${result.data.matchesCreated} confrontos gerados na rodada ${result.data.round}`
+        );
+        window.location.href = `/dashboard/championships/${knockoutChampionship.id}/matches`;
+      } else {
+        toast.error("Erro ao gerar confrontos mata-mata");
+      }
+    } catch (error) {
+      toast.error("Erro ao conectar com o servidor");
+      console.error("Erro ao gerar mata-mata:", error);
+    } finally {
+      setIsCreatingKnockout(false);
+    }
+  };
+
   return (
     <main className="flex flex-col items-center p-4 md:px-6">
       <h1 className="w-full text-2xl font-bold mb-4 text-center">
@@ -347,6 +440,7 @@ export default function ChampionshipsPage() {
                       championship={championship}
                       onEdit={handleEditClick}
                       onTeams={handleTeamsClick}
+                      onKnockout={handleKnockoutClick}
                       onDelete={handleDeleteClick}
                     />
                   ))}
@@ -414,6 +508,15 @@ export default function ChampionshipsPage() {
         onTeamToggle={handleTeamToggle}
         onGenerateMatches={handleGenerateMatches}
         isGenerating={isGenerating}
+      />
+
+      <KnockoutPairsModal
+        open={knockoutModalOpen}
+        onOpenChange={setKnockoutModalOpen}
+        championship={knockoutChampionship}
+        teams={teams}
+        isSubmitting={isCreatingKnockout}
+        onSubmit={handleCreateKnockout}
       />
     </main>
   );

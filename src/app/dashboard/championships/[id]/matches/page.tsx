@@ -51,6 +51,8 @@ interface Match {
   championshipId: number;
   playDay: string | null;
   status: number;
+  round?: number | null;
+  isKnockout?: boolean;
   createdAt: string;
   updatedAt: string;
   championship: Championship;
@@ -65,6 +67,7 @@ export default function ChampionshipMatchesPage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [championshipName, setChampionshipName] = useState("");
+  const [isAdvancing, setIsAdvancing] = useState(false);
 
   // Modal de resultado
   const [resultModalOpen, setResultModalOpen] = useState(false);
@@ -84,6 +87,33 @@ export default function ChampionshipMatchesPage() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const hasKnockoutMatches = matches.some((match) => match.isKnockout);
+  const maxRound = matches.reduce((acc, match) => {
+    if (!match.isKnockout || match.round == null) return acc;
+    return Math.max(acc, match.round);
+  }, 0);
+  const hasScheduledMatches = matches.some((match) => match.status === 0);
+
+  const finalMatch = matches.filter(
+    (match) =>
+      match.isKnockout &&
+      match.round === maxRound &&
+      match.status === 2
+  );
+
+  const championName = (() => {
+    if (hasScheduledMatches) return null;
+    if (finalMatch.length !== 1) return null;
+    const match = finalMatch[0];
+    if (match.matchTeams.length !== 2) return null;
+    const [teamA, teamB] = match.matchTeams;
+    if (!teamA || !teamB) return null;
+    if (teamA.goalsTeam === teamB.goalsTeam) return null;
+    return teamA.goalsTeam > teamB.goalsTeam
+      ? teamA.team.name
+      : teamB.team.name;
+  })();
 
   function formatDate(date?: string | null) {
     if (!date) return <span className="text-gray-400">–</span>;
@@ -224,6 +254,39 @@ export default function ChampionshipMatchesPage() {
     }
   };
 
+  const handleAdvanceKnockout = async () => {
+    if (!hasKnockoutMatches || maxRound === 0) return;
+    setIsAdvancing(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/championships/${championshipId}/knockout-advance`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ round: maxRound }),
+        }
+      );
+      if (response.ok) {
+        const result = await response.json();
+        await fetchMatches();
+        toast.success(
+          `Rodada ${result.data.round} criada com ${result.data.matchesCreated} partidas`
+        );
+      } else {
+        toast.error("Não foi possível avançar o mata-mata");
+      }
+    } catch (error) {
+      toast.error("Erro ao conectar com o servidor");
+      console.error("Erro ao avançar mata-mata:", error);
+    } finally {
+      setIsAdvancing(false);
+    }
+  };
+
   return (
     <main className="flex flex-col items-center p-4 md:px-6">
       <div className="w-full max-w-4xl mb-4">
@@ -238,6 +301,26 @@ export default function ChampionshipMatchesPage() {
         <h1 className="text-2xl font-bold text-center">
           Partidas - {championshipName}
         </h1>
+        {championName && (
+          <div className="mt-4 flex flex-col items-center gap-2">
+            <div className="text-sm text-gray-600">Campeão do Mata-Mata</div>
+            <div className="flex items-center gap-3 rounded-full bg-yellow-100 px-4 py-2 text-yellow-900">
+              <span className="trophy-animation text-xl">🏆</span>
+              <span className="font-semibold">{championName}</span>
+            </div>
+          </div>
+        )}
+        {hasKnockoutMatches && (
+          <div className="flex justify-center mt-3">
+            <Button
+              className="bg-purple-700 hover:bg-purple-800"
+              onClick={handleAdvanceKnockout}
+              disabled={isAdvancing}
+            >
+              {isAdvancing ? "Gerando..." : "Gerar próxima fase"}
+            </Button>
+          </div>
+        )}
       </div>
 
       <Card className="w-full max-w-4xl">
@@ -256,6 +339,7 @@ export default function ChampionshipMatchesPage() {
                 </TableCaption>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Rodada</TableHead>
                     <TableHead>Times</TableHead>
                     <TableHead>Placar</TableHead>
                     <TableHead>Status</TableHead>
@@ -268,7 +352,7 @@ export default function ChampionshipMatchesPage() {
                   {paginatedMatches.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={6}
+                        colSpan={7}
                         className="text-center text-gray-500"
                       >
                         Nenhuma partida encontrada para este campeonato.
@@ -281,6 +365,9 @@ export default function ChampionshipMatchesPage() {
 
                       return (
                         <TableRow key={match.id}>
+                          <TableCell>
+                            {match.isKnockout ? match.round ?? "–" : "–"}
+                          </TableCell>
                           <TableCell>
                             <div className="flex flex-col gap-1">
                               <div className="flex items-center gap-2">
@@ -421,6 +508,21 @@ export default function ChampionshipMatchesPage() {
           )}
         </DialogContent>
       </Dialog>
+      <style jsx>{`
+        .trophy-animation {
+          display: inline-block;
+          animation: trophy-bounce 1.4s ease-in-out infinite;
+        }
+        @keyframes trophy-bounce {
+          0%,
+          100% {
+            transform: translateY(0) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-6px) rotate(-6deg);
+          }
+        }
+      `}</style>
     </main>
   );
 }
