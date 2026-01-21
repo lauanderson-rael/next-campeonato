@@ -32,6 +32,26 @@ interface Championship {
   name: string;
   year: number;
   modality: string;
+  format?: string;
+}
+
+interface MatchTeam {
+  id: number;
+  teamId: number;
+  goalsTeam?: number;
+  team: {
+    id: number;
+    name: string;
+  };
+}
+
+interface Match {
+  id: number;
+  round?: number | null;
+  bracketOrder?: number | null;
+  isKnockout?: boolean;
+  status?: number;
+  matchTeams: MatchTeam[];
 }
 
 export default function RankingPage() {
@@ -43,6 +63,7 @@ export default function RankingPage() {
     string | null
   >(championshipId);
   const [ranking, setRanking] = useState<RankingTeam[]>([]);
+  const [knockoutMatches, setKnockoutMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchChampionships = useCallback(async () => {
@@ -75,6 +96,7 @@ export default function RankingPage() {
       fetchRanking(selectedChampionshipId);
     } else {
       setRanking([]);
+      setKnockoutMatches([]);
       setIsLoading(false);
     }
   }, [selectedChampionshipId]);
@@ -83,19 +105,33 @@ export default function RankingPage() {
     setIsLoading(true);
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/championships/${id}/ranking`,
-        {
+      const [rankingRes, matchesRes] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/championships/${id}/ranking`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
-      );
-      const data = await res.json();
-      setRanking(data);
+        }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/matches?championshipId=${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+      ]);
+
+      const rankingData = await rankingRes.json();
+      setRanking(Array.isArray(rankingData) ? rankingData : []);
+
+      if (matchesRes.ok) {
+        const matchesData = await matchesRes.json();
+        const normalizedMatches = Array.isArray(matchesData) ? matchesData : [];
+        setKnockoutMatches(normalizedMatches.filter((match) => match.isKnockout));
+      } else {
+        setKnockoutMatches([]);
+      }
     } catch (error) {
       console.error("Erro ao buscar ranking:", error);
       setRanking([]);
+      setKnockoutMatches([]);
     } finally {
       setIsLoading(false);
     }
@@ -142,6 +178,70 @@ export default function RankingPage() {
         <CardContent className="max-h-[60dvh] overflow-y-auto">
           {isLoading ? (
             <p className="text-center text-gray-500">Carregando ranking...</p>
+          ) : selectedChampionship?.format === "Mata-Mata" ? (
+            knockoutMatches.length === 0 ? (
+              <p className="text-center text-gray-500">
+                Nenhum confronto mata-mata encontrado para este campeonato.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {Array.from(
+                  new Map(
+                    knockoutMatches
+                      .sort((a, b) => {
+                        const roundA = a.round ?? 0;
+                        const roundB = b.round ?? 0;
+                        if (roundA !== roundB) return roundA - roundB;
+                        const orderA = a.bracketOrder ?? 0;
+                        const orderB = b.bracketOrder ?? 0;
+                        return orderA - orderB;
+                      })
+                      .map((match) => [match.round ?? 0, match])
+                  )
+                ).map(([round]) => {
+                  const roundMatches = knockoutMatches
+                    .filter((match) => (match.round ?? 0) === round)
+                    .sort((a, b) => (a.bracketOrder ?? 0) - (b.bracketOrder ?? 0));
+
+                  return (
+                    <div key={round} className="rounded-lg border border-gray-200">
+                      <div className="bg-gray-100 text-gray-700 px-4 py-2 text-sm font-semibold">
+                        Rodada {round}
+                      </div>
+                      <div className="divide-y">
+                        {roundMatches.map((match) => {
+                          const [teamA, teamB] = [...match.matchTeams].sort(
+                            (a, b) => a.id - b.id
+                          );
+                          const hasResult =
+                            match.status === 2 &&
+                            typeof teamA?.goalsTeam === "number" &&
+                            typeof teamB?.goalsTeam === "number";
+                          return (
+                            <div
+                              key={match.id}
+                              className="grid grid-cols-3 items-center gap-3 px-4 py-3 text-sm"
+                            >
+                              <span className="font-medium text-gray-800">
+                                {teamA?.team?.name ?? "Time A"}
+                              </span>
+                              <span className="text-center text-gray-500">
+                                {hasResult
+                                  ? `${teamA?.goalsTeam ?? 0} x ${teamB?.goalsTeam ?? 0}`
+                                  : "vs"}
+                              </span>
+                              <span className="font-medium text-gray-800">
+                                {teamB?.team?.name ?? "Time B"}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )
           ) : ranking.length === 0 ? (
             <p className="text-center text-gray-500">
               {selectedChampionshipId
