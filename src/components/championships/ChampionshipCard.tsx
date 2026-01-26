@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Edit, Plus, Eye, Trash2, Trophy } from "lucide-react";
+import { Edit, Plus, Eye, Trash2, Trophy, ChartNoAxesColumn } from "lucide-react";
 
 interface Team {
   id: number;
@@ -41,60 +41,36 @@ export function ChampionshipCard({
   onDelete,
 }: ChampionshipCardProps) {
   return (
-    <Card className="hover:shadow-lg transition-all relative border-t-8 border-green-600 hover:bg-green-50 duration-300 ">
-      {/* <div className="absolute top-0 left-0 right-0 h-1 bg-green-600 rounded-t-xl"></div> */}
+    <Card className="hover:shadow-xl transition-all relative border-t-12 border-green-600 hover:bg-green-50/50 duration-300 overflow-hidden group">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg">{championship.name}</CardTitle>
-        <div className="flex justify-between text-sm text-gray-600">
-          <span>{championship.year}</span>
-          <div className="flex gap-2">
-            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-              {championship.modality}
-            </span>
-            {championship.format && (
-              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                {championship.format}
-              </span>
-            )}
-          </div>
+        <div className="flex justify-between items-start">
+          <CardTitle className="text-lg font-bold text-gray-800 line-clamp-1 group-hover:text-green-700 transition-colors">
+            {championship.name}
+          </CardTitle>
+          <span className="text-xs font-semibold text-gray-500">{championship.year}</span>
         </div>
-        <span className="text-xs text-gray-500">
+        
+        <div className="flex gap-2 mt-1">
+          <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider">
+            {championship.modality}
+          </span>
+          {championship.format && (
+            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider">
+              {championship.format}
+            </span>
+          )}
+        </div>
+        
+        <div className="text-[14px] text-gray-400 mt-2">
           Criado em: {formatDate(championship.createdAt)}
-        </span>
+        </div>
       </CardHeader>
-      <CardContent className="pt-0">
-        <div className="flex gap-2 justify-center flex-wrap">
+      
+      <CardContent className="pt-2">
+        <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
-            className="flex items-center gap-1 text-yellow-600 hover:text-yellow-800 px-2 py-1 rounded transition-colors hover:bg-yellow-50 text-xs"
-            onClick={() => onEdit(championship)}
-          >
-            <Edit size={14} />
-            <span>Editar</span>
-          </button>
-          {championship.format !== "Mata-Mata" && (
-            <button
-              type="button"
-              className="flex items-center gap-1 text-green-600 hover:text-green-800 px-2 py-1 rounded transition-colors hover:bg-green-50 text-xs"
-              onClick={() => onTeams(championship)}
-            >
-              <Plus size={14} />
-              <span>Times</span>
-            </button>
-          )}
-          {championship.format === "Mata-Mata" && onKnockout && (
-            <button
-              type="button"
-              className="flex items-center gap-1 text-purple-600 hover:text-purple-800 px-2 py-1 rounded transition-colors hover:bg-purple-50 text-xs"
-              onClick={() => onKnockout(championship)}
-            >
-              <Trophy size={14} />
-              <span>Confrontos mata-mata</span>
-            </button>
-          )}
-          <button
-            type="button"
-            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 px-2 py-1 rounded transition-colors hover:bg-blue-50 text-xs"
+            className="flex items-center justify-center gap-1.5 text-blue-600 hover:text-white border border-blue-200 hover:border-blue-600 px-2 py-2 rounded-md transition-all hover:bg-blue-600 text-xs font-medium"
             onClick={() =>
               (window.location.href = `/dashboard/championships/${championship.id}/matches`)
             }
@@ -102,13 +78,56 @@ export function ChampionshipCard({
             <Eye size={14} />
             <span>Partidas</span>
           </button>
+
           <button
             type="button"
-            className="flex items-center gap-1 text-red-600 hover:text-red-800 px-2 py-1 rounded transition-colors hover:bg-red-50 text-xs"
+            className="flex items-center justify-center gap-1.5 text-amber-600 hover:text-white border border-amber-200 hover:border-amber-600 px-2 py-2 rounded-md transition-all hover:bg-amber-600 text-xs font-medium"
+            onClick={() =>
+              (window.location.href = `/dashboard/ranking?championshipId=${championship.id}`)
+            }
+          >
+            <ChartNoAxesColumn size={14} />
+            <span>Ranking</span>
+          </button>
+
+          {championship.format !== "Mata-Mata" && (
+            <button
+              type="button"
+              className="flex items-center justify-center gap-1.5 text-emerald-600 hover:text-white border border-emerald-200 hover:border-emerald-600 px-2 py-2 rounded-md transition-all hover:bg-emerald-600 text-xs font-medium"
+              onClick={() => onTeams(championship)}
+            >
+              <Plus size={14} />
+              <span>Inscritos</span>
+            </button>
+          )}
+
+          {championship.format === "Mata-Mata" && onKnockout && (
+            <button
+              type="button"
+              className="flex items-center justify-center gap-1.5 text-purple-600 hover:text-white border border-purple-200 hover:border-purple-600 px-2 py-2 rounded-md transition-all hover:bg-purple-600 text-xs font-medium"
+              onClick={() => onKnockout(championship)}
+            >
+              <Trophy size={14} />
+              <span>Chaveamento</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="flex items-center justify-center gap-1.5 text-gray-600 hover:text-white border border-gray-200 hover:border-gray-600 px-2 py-2 rounded-md transition-all hover:bg-gray-600 text-xs font-medium"
+            onClick={() => onEdit(championship)}
+          >
+            <Edit size={14} />
+            <span>Editar</span>
+          </button>
+
+          <button
+            type="button"
+            className="flex items-center justify-center gap-1.5 text-red-600 hover:text-white border border-red-100 hover:border-red-600 px-2 py-2 rounded-md transition-all hover:bg-red-600 text-xs font-medium col-span-2 mt-1"
             onClick={() => onDelete(championship)}
           >
             <Trash2 size={14} />
-            <span>Excluir</span>
+            <span>Excluir Campeonato</span>
           </button>
         </div>
       </CardContent>

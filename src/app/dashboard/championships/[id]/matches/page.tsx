@@ -312,13 +312,24 @@ export default function ChampionshipMatchesPage() {
         )}
         {hasKnockoutMatches && (
           <div className="flex justify-center mt-3">
-            <Button
-              className="bg-purple-700 hover:bg-purple-800"
-              onClick={handleAdvanceKnockout}
-              disabled={isAdvancing}
-            >
-              {isAdvancing ? "Gerando..." : "Gerar próxima fase"}
-            </Button>
+            {championName ? (
+              <div className="bg-green-100 text-green-800 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 border border-green-200 shadow-sm">
+                <span>Campeonato Finalizado</span>
+              </div>
+            ) : (
+              <Button
+                className={`shadow-md transition-all ${
+                  hasScheduledMatches
+                    ? "bg-gray-300 text-gray-600 opacity-80 cursor-not-allowed pointer-events-none"
+                    : "bg-purple-700 hover:bg-purple-800 text-white hover:scale-105 active:scale-95"
+                }`}
+                onClick={handleAdvanceKnockout}
+                disabled={isAdvancing || hasScheduledMatches}
+                title={hasScheduledMatches ? "Finalize todas as partidas para avançar" : ""}
+              >
+                {isAdvancing ? "Gerando..." : "Gerar próxima fase"}
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -364,7 +375,10 @@ export default function ChampionshipMatchesPage() {
                       const team2 = match.matchTeams[1];
 
                       return (
-                        <TableRow key={match.id}>
+                        <TableRow 
+                          key={match.id}
+                          className={match.status === 0 || match.status === 1 ? "border-l-4 border-l-yellow-600 bg-yellow-50/30" : ""}
+                        >
                           <TableCell>
                             {match.isKnockout ? match.round ?? "–" : "–"}
                           </TableCell>
