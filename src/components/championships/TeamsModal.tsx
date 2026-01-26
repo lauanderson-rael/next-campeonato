@@ -35,51 +35,69 @@ export function TeamsModal({
   onGenerateMatches,
   isGenerating
 }: TeamsModalProps) {
+  // Filtrar times pela mesma modalidade do campeonato
+  const filteredTeams = teams.filter(team => team.modality === championship?.modality);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            Adicionar Times - {championship?.name}
-          </DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 mt-2">
-          <p className="text-sm text-gray-600">
-            Selecione os times que participarão do campeonato:
+<Dialog open={open} onOpenChange={onOpenChange}>
+  <DialogContent className="max-w-md">
+    <DialogHeader>
+      <DialogTitle>Inscritos - {championship?.name}</DialogTitle>
+    </DialogHeader>
+    
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <span className="text-sm text-gray-600">
+          Participantes do {championship?.modality}
+        </span>
+        <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+          {selectedTeams.length} selecionados
+        </span>
+      </div>
+      
+      <div className="max-h-80 overflow-y-auto space-y-2 border rounded p-3 bg-gray-50">
+        {filteredTeams.length === 0 ? (
+          <p className="text-center py-8 text-gray-500 text-sm">
+            Nenhum time de {championship?.modality} encontrado.
           </p>
-          <div className="max-h-60 overflow-y-auto space-y-2">
-            {teams.map((team) => (
-              <label
-                key={team.id}
-                className="flex items-center space-x-2 cursor-pointer"
-              >
+        ) : (
+          filteredTeams.map((team) => (
+            <label
+              key={team.id}
+              className={`flex items-center justify-between p-3 rounded border cursor-pointer ${
+                selectedTeams.includes(team.id)
+                  ? "border-green-500 bg-green-50"
+                  : "border-gray-200 bg-white hover:border-green-300"
+              }`}
+            >
+              <div className="flex items-center gap-3">
                 <input
                   type="checkbox"
                   checked={selectedTeams.includes(team.id)}
                   onChange={() => onTeamToggle(team.id)}
-                  className="rounded"
+                  className="w-4 h-4 text-green-600 rounded"
                 />
-                <span>{team.name}</span>
-                <span className="text-sm text-gray-500">
-                  ({team.modality})
-                </span>
-              </label>
-            ))}
-          </div>
-          <p className="text-sm text-gray-500">
-            Times selecionados: {selectedTeams.length}
-          </p>
-        </div>
-        <DialogFooter>
-          <Button
-            onClick={onGenerateMatches}
-            className="bg-green-700 hover:bg-green-800 w-full"
-            disabled={isGenerating || selectedTeams.length < 2}
-          >
-            {isGenerating ? "Gerando..." : "Gerar Partidas"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+                <div>
+                  <div className="font-medium text-sm">{team.name}</div>
+                  <div className="text-xs text-gray-500">{team.modality}</div>
+                </div>
+              </div>
+            </label>
+          ))
+        )}
+      </div>
+    </div>
+    
+    <DialogFooter>
+      <Button
+        onClick={onGenerateMatches}
+        className="bg-green-600 hover:bg-green-700 w-full"
+        disabled={isGenerating || selectedTeams.length < 2}
+      >
+        {isGenerating ? "Processando..." : "Atualizar Participantes"}
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
   );
 }

@@ -228,7 +228,8 @@ export default function ChampionshipsPage() {
 
   const handleTeamsClick = (championship: Championship) => {
     setSelectedChampionship(championship);
-    setSelectedTeams([]);
+    const existingTeamIds = (championship.teams || []).map((t) => t.id);
+    setSelectedTeams(existingTeamIds);
     setTeamsModalOpen(true);
   };
 
@@ -408,7 +409,7 @@ export default function ChampionshipsPage() {
       <h1 className="w-full text-2xl font-bold mb-4 text-center">
         Campeonatos
       </h1>
-      <Card className="w-full max-w-4xl">
+      <Card className="w-full max-w-6xl">
         <CardHeader className="flex justify-between items-center flex-row">
           <SearchInput
             placeholder="Buscar campeonatos..."

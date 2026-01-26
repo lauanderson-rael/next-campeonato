@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SearchInput } from "@/components/search-input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, ArrowRight, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pencil, Trash2, Users } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +35,21 @@ interface Team {
   createdAt?: string;
 }
 
+interface Class {
+  id: number;
+  name: string;
+}
+
+interface Player {
+  id: number;
+  name: string;
+  age: number;
+  classId: number;
+  teamId: number;
+  class?: Class;
+  createdAt?: string;
+}
+
 export default function TeamsPage() {
   useVerifyUserLogged();
   const [teams, setTeams] = useState<Team[]>([]);
@@ -56,6 +71,12 @@ export default function TeamsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Listagem de Jogadores do Time
+  const [playersModalOpen, setPlayersModalOpen] = useState(false);
+  const [selectedTeamPlayers, setSelectedTeamPlayers] = useState<Player[]>([]);
+  const [isPlayersLoading, setIsPlayersLoading] = useState(false);
+  const [selectedTeamName, setSelectedTeamName] = useState("");
 
   // Busca
   const [searchTerm, setSearchTerm] = useState("");
@@ -209,6 +230,38 @@ export default function TeamsPage() {
       setIsEditing(false);
     }
   }
+
+  // Visualizar Jogadores
+  const handleViewPlayers = async (team: Team) => {
+    setSelectedTeamName(team.name);
+    setIsPlayersLoading(true);
+    setPlayersModalOpen(true);
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/players?teamId=${team.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      
+      // Filtro no client-side para garantir que só apareçam jogadores do time
+      // caso o backend não suporte o filtro por query string
+      const filteredData = Array.isArray(data) 
+        ? data.filter((p: Player) => p.teamId === team.id)
+        : [];
+        
+      setSelectedTeamPlayers(filteredData);
+    } catch (error) {
+      console.error("Erro ao buscar jogadores do time:", error);
+      toast.error("Erro ao carregar jogadores");
+    } finally {
+      setIsPlayersLoading(false);
+    }
+  };
 
   return (
     <main className="flex flex-col items-center p-4 md:px-6">
@@ -364,6 +417,15 @@ export default function TeamsPage() {
                           <div className="flex gap-2">
                             <button
                               type="button"
+                              aria-label="Ver Jogadores"
+                              title="Ver Jogadores"
+                              className="text-blue-600 hover:text-blue-800 p-2 rounded transition-colors"
+                              onClick={() => handleViewPlayers(team)}
+                            >
+                              <Users size={18} />
+                            </button>
+                            <button
+                              type="button"
                               aria-label="Editar"
                               className="text-green-700 hover:text-green-900 p-2 rounded transition-colors"
                               onClick={() => handleEditOpen(team)}
@@ -420,6 +482,68 @@ export default function TeamsPage() {
         description={`Tem certeza que deseja excluir o time "${teamToDelete?.name}"? Esta ação não pode ser desfeita.`}
         isDeleting={isDeleting}
       />
+
+      {/* Modal de Jogadores do Time */}
+      <Dialog open={playersModalOpen} onOpenChange={setPlayersModalOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Jogadores do Time - {selectedTeamName} </DialogTitle>
+            <span style={{ color: "gray" }}>Total: {selectedTeamPlayers.length}</span>
+          </DialogHeader>
+          <div className="mt-4">
+            {isPlayersLoading ? (
+              <p className="text-center py-8">Carregando jogadores...</p>
+            ) : (
+              <div className="max-h-[50dvh] overflow-y-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Idade</TableHead>
+                      <TableHead>Turma</TableHead>
+                      <TableHead>Data de Cadastro</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {selectedTeamPlayers.length === 0 ? (
+                      <TableRow>
+                        <TableCell
+                          colSpan={4}
+                          className="text-center text-gray-500 py-8"
+                        >
+                          Nenhum jogador cadastrado para este time.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      selectedTeamPlayers.map((player) => (
+                        <TableRow key={player.id}>
+                          <TableCell className="font-medium">
+                            {player.name}
+                          </TableCell>
+                          <TableCell>{player.age}</TableCell>
+                          <TableCell>
+                            {player.class?.name || "–"}
+                          </TableCell>
+                          <TableCell>{formatDate(player.createdAt)}</TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="destructive"
+              onClick={() => setPlayersModalOpen(false)}
+              className="w-full"
+            >
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
